@@ -1,5 +1,6 @@
 package com.epa.dataCollector;
 
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.epa.util.EnviroFactsUtil;
+import com.epa.util.HibernateUtil;
 
 
 @RestController
@@ -24,6 +26,10 @@ public class CollectionControllerApi {
 	@RequestMapping("/test")
 	public String test() {
 		System.out.println("Reached test");
+		
+//		Session session = HibernateUtil.getSessionFactory().openSession();
+//        session.beginTransaction();
+        
 		return "Got it!";
 	}
 	
@@ -94,5 +100,10 @@ public class CollectionControllerApi {
 	@RequestMapping(method = RequestMethod.GET,  value = "/clearLists")
 	public boolean clearLists() {
 		return apiImpl.clearLists();
+	}
+	
+	@RequestMapping(method = RequestMethod.GET, value = "/getAllGeneration")
+	public String getAllGeneration() {
+		return apiImpl.getAllGeneration();
 	}
 }

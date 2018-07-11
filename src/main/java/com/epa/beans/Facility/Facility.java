@@ -1,15 +1,32 @@
 package com.epa.beans.Facility;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@Entity
+@Table(name="Facility")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Facility {
-	
-	@JsonProperty("NAICS_CODE") String naicsCode;
-	@JsonProperty("CODE_DESCRIPTION") String codeDescription;
+
+	@Id
+	@Column(name = "facId")
 	@JsonProperty("PGM_SYS_ID") String facId;
+	
+	@Column(name = "naicsCode")
+	@JsonProperty("NAICS_CODE") String naicsCode;
+	
+	@Column(name = "codeDescription")
+	@JsonProperty("CODE_DESCRIPTION") String codeDescription;
+	
+	@Column(name = "registryId")
 	@JsonProperty("REGISTRY_ID") String registryId;
+	
+	@Column(name = "primaryName")
 	@JsonProperty("PRIMARY_NAME") String primaryName;
 
 	public Facility() {

@@ -2,19 +2,42 @@ package com.epa.beans.EIAGeneration;
 
 import java.util.Map;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@Entity
+@Table(name="genTest")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PlantGeneration {
 
-	@JsonProperty("series_id") String series_id;
+	@Id
+	@Column(name = "series_id")
+	@JsonProperty("series_id") String series_id;	
+	@Column(name = "name", length=150)
 	@JsonProperty("name") String name;
+	
+	@Column(name = "units", length=20)
 	@JsonProperty("units") String units;
+	
+	@Column(name = "latitude")
 	@JsonProperty("lat") String latitude;
+	
+	@Column(name = "longitude")
 	@JsonProperty("lon") String longitude;
-	@JsonProperty("start") String start;
-	@JsonProperty("end") String end;
+	
+	@Column(name = "startDate")
+	@JsonProperty("start") String startDate;
+	
+	@Column(name = "endDate")
+	@JsonProperty("end") String endDate;
+	
+	@Transient
 	@JsonProperty("data") String data[][];
 	
 	public PlantGeneration() {
@@ -30,8 +53,8 @@ public class PlantGeneration {
 		this.units = units;
 		this.latitude = latitude;
 		this.longitude = longitude;
-		this.start = start;
-		this.end = end;
+		this.startDate = start;
+		this.endDate = end;
 		//this.data = data;
 	}
 
@@ -67,16 +90,16 @@ public class PlantGeneration {
 		this.longitude = longitude;
 	}
 	public String getStart() {
-		return start;
+		return startDate;
 	}
 	public void setStart(String start) {
-		this.start = start;
+		this.startDate = start;
 	}
 	public String getEnd() {
-		return end;
+		return endDate;
 	}
 	public void setEnd(String end) {
-		this.end = end;
+		this.endDate = end;
 	}
 
 	public String[][] getData() {
@@ -100,7 +123,7 @@ public class PlantGeneration {
 	@Override
 	public String toString() {
 		return "PlantGeneration [series_id=" + series_id + ", name=" + name + ", units=" + units + ", latitude="
-				+ latitude + ", longitude=" + longitude + ", start=" + start + ", end=" + end + ", data="
+				+ latitude + ", longitude=" + longitude + ", start=" + startDate + ", end=" + endDate + ", data="
 				+ printData(data) + "]";
 	}
 

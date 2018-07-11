@@ -6,12 +6,19 @@ import static com.epa.util.EPAConstants.emissionsIdentifier;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.assertj.core.util.Arrays;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.cfg.Configuration;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.epa.beans.CountObject;
 import com.epa.beans.ObjectList;
 import com.epa.beans.EIAGeneration.GenerationSeries;
+import com.epa.beans.EIAGeneration.PlantGeneration;
 import com.epa.beans.EISEmission.Pollutant;
 import com.epa.beans.Facility.Facility;
 import com.epa.beans.GHGEmissions.Emissions;
@@ -19,6 +26,7 @@ import com.epa.beans.GHGEmissions.EmissionsData;
 import com.epa.beans.GHGEmissions.GasInfo;
 import com.epa.util.EPAConstants;
 import com.epa.util.EnviroFactsUtil;
+import com.epa.util.HibernateUtil;
 
 @Service
 public class CollectionControllerApiImpl {
@@ -28,6 +36,7 @@ public class CollectionControllerApiImpl {
 	private static ObjectList<Emissions> emissionsList = new ObjectList<Emissions>();
 	private static ObjectList<Pollutant> pollutantsList = new ObjectList<Pollutant>();
 	private static ObjectList<GasInfo> gasInfoList = new ObjectList<GasInfo>();
+	
 	private static Map<String, Emissions> emissionsMap = new HashMap<String, Emissions>();
 	private static Map<String, GenerationSeries> generationMap = new HashMap<String, GenerationSeries>();
 	
@@ -67,6 +76,22 @@ public class CollectionControllerApiImpl {
 				for(Facility fac : facility) {
 					facList.objectList.add(fac);
 				}
+				
+				
+				Session session = HibernateUtil.getSessionFactory().openSession();
+				
+				Transaction tx = null;
+				try {
+					tx = session.beginTransaction();
+			        session.save(facility[0]);
+			        tx.commit();
+				 } catch (HibernateException e) {
+				 	if (tx!=null) tx.rollback();
+				 		e.printStackTrace(); 
+				 } finally {
+					 session.close();
+				 }
+				
 				return facList.toString();
 	
 				
@@ -110,9 +135,23 @@ public class CollectionControllerApiImpl {
 		StringBuilder urlBuilder = new StringBuilder();
 
 		urlBuilder.append(EPAConstants.eiaBaseURL).append(EPAConstants.eiaSeriesHead).append(plantCode).append(EPAConstants.eiaSeriesTail);
-		System.out.println(urlBuilder.toString());
+	//	System.out.println(urlBuilder.toString());
 		GenerationSeries plant = restTemplate.getForObject(urlBuilder.toString() , GenerationSeries.class);
 		
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		
+		Transaction tx = null;
+		try {
+			tx = session.beginTransaction();
+	        session.save(plant.getSeries()[0]);
+	        tx.commit();
+		 } catch (HibernateException e) {
+		 	if (tx!=null) tx.rollback();
+		 		e.printStackTrace(); 
+		 } finally {
+			 session.close();
+		 }
+        
 		return plant;
 	}
 	
@@ -167,11 +206,10 @@ public class CollectionControllerApiImpl {
 	public String getData() {
 			
 		StringBuilder finalResult = new StringBuilder();
-
 		
 		getGreenhouseGasInfo("");
 		
-		for(int i=0 ; i<40000; i+=50) {
+		for(int i=4000 ; i<5000; i+=50) {
 			
 			try {
 				initiateCollectionImpl("facid", "json", ""+i, ""+(i+49), "NAICS_CODE", "BEGINNING/2211", true);
@@ -191,7 +229,7 @@ public class CollectionControllerApiImpl {
 		
 		for(Facility fac : facList.objectList) {
 			if(EnviroFactsUtil.isNumeric(fac.getFacId())) {
-				System.out.println("Running fac id - " + fac.getFacId() + " emissions -");
+				System.out.println("Running fac id - " + fac.getFacId() + " generation -");
 				generationMap.put(fac.getFacId(), (getGenerationData(fac.getFacId())));
 			}
 			
@@ -235,5 +273,44 @@ public class CollectionControllerApiImpl {
 		gasInfoList.objectList.clear();
 	
 		return true;
+	}
+
+	public String getAllGeneration() {
+		
+		System.out.println("Started....");
+		int gen = 0, fac = 0, both = 0;
+		
+		for(int i = 0; i < 70000; i++) {
+			GenerationSeries temp = getGenerationData(""+i);
+			//System.out.println(temp);
+			boolean gotFac = false, gotGen = false;
+			
+			if(temp.getSeries() != null) {
+				gen++;
+				gotGen = true;
+			}
+//				generationMap.put(""+i, temp);
+			Facility[] facility = null;
+		
+			while(!gotFac) {
+				try {
+					facility = restTemplate.getForObject("https://iaspub.epa.gov/enviro/efservice/T_FRS_NAICS_EZ/PGM_SYS_ID/"+i+"/json/rows/0:0", Facility[].class);
+					gotFac = true;
+				} catch(Exception e) {
+					gotFac = false;
+				}
+			}
+				
+			if(!Arrays.isNullOrEmpty(facility)) {
+				//System.out.println(facility[0].toString());
+				
+				fac++;
+				if(gotGen)
+					both++;
+			}
+			temp = null;
+		}
+		
+		return "Gen = " + gen + " Fac = " + fac + " Both = " + both;
 	}
 }
