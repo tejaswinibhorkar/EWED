@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GenerationSeries {
 
+	String plantCode;
 	@JsonProperty("series") PlantGeneration[] series;
 
 	public GenerationSeries() {
@@ -28,6 +29,16 @@ public class GenerationSeries {
 
 	public void setSeries(PlantGeneration[] series) {
 		this.series = series;
+	}
+
+
+	public String getPlantCode() {
+		return plantCode;
+	}
+
+
+	public void setPlantCode(String plantCode) {
+		this.plantCode = plantCode;
 	}
 
 
