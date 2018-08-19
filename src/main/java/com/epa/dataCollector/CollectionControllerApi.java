@@ -24,6 +24,10 @@ public class CollectionControllerApi {
 	@RequestMapping("/test")
 	public String test() {
 		System.out.println("Reached test");
+		
+//		Session session = HibernateUtil.getSessionFactory().openSession();
+//        session.beginTransaction();
+        
 		return "Got it!";
 	}
 	
@@ -94,5 +98,20 @@ public class CollectionControllerApi {
 	@RequestMapping(method = RequestMethod.GET,  value = "/clearLists")
 	public boolean clearLists() {
 		return apiImpl.clearLists();
+	}
+	
+	@RequestMapping(method = RequestMethod.GET, value = "/getAllGeneration")
+	public String getAllGeneration() {
+		return apiImpl.getAllGeneration();
+	}
+	
+	@RequestMapping(method = RequestMethod.GET, value = "/getGenerationFromFile")
+	public String getGenerationFromFile() {
+		return apiImpl.getGenerationFromFile();
+	}
+	
+	@RequestMapping(method = RequestMethod.GET, value = "/getFacilityfromGen")
+	public String getFacilityfromGen() {
+		return apiImpl.getFacilityfromGen();
 	}
 }
