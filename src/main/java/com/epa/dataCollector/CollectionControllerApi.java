@@ -1,6 +1,5 @@
 package com.epa.dataCollector;
 
-import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.epa.util.EnviroFactsUtil;
-import com.epa.util.HibernateUtil;
 
 
 @RestController
@@ -105,5 +103,15 @@ public class CollectionControllerApi {
 	@RequestMapping(method = RequestMethod.GET, value = "/getAllGeneration")
 	public String getAllGeneration() {
 		return apiImpl.getAllGeneration();
+	}
+	
+	@RequestMapping(method = RequestMethod.GET, value = "/getGenerationFromFile")
+	public String getGenerationFromFile() {
+		return apiImpl.getGenerationFromFile();
+	}
+	
+	@RequestMapping(method = RequestMethod.GET, value = "/getFacilityfromGen")
+	public String getFacilityfromGen() {
+		return apiImpl.getFacilityfromGen();
 	}
 }

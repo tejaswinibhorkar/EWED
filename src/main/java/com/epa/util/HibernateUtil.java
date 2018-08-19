@@ -1,10 +1,10 @@
 package com.epa.util;
 
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
-import com.epa.beans.EIAGeneration.PlantGeneration;
+import com.epa.beans.EIAGeneration.GenerationRow;
+import com.epa.beans.Facility.Facility;
  
 public class HibernateUtil {
 	
@@ -16,7 +16,8 @@ public class HibernateUtil {
 			 sessionFactory = new Configuration().
 	                  configure("/hibernate.cfg.xml").
 	                  //addPackage("com.xyz") //add package if used.
-	                  addAnnotatedClass(PlantGeneration.class).
+	                  addAnnotatedClass(GenerationRow.class).
+	                  addAnnotatedClass(Facility.class).
 	                  buildSessionFactory();
 	     } catch (Throwable ex) { 
 	        System.err.println("Failed to create sessionFactory object." + ex);

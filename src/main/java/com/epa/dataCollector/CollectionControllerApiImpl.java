@@ -3,26 +3,31 @@ package com.epa.dataCollector;
 import static com.epa.util.EPAConstants.dbNameMap;
 import static com.epa.util.EPAConstants.emissionsIdentifier;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import org.assertj.core.util.Arrays;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.epa.beans.CountObject;
 import com.epa.beans.ObjectList;
+import com.epa.beans.EIAGeneration.GenerationRow;
 import com.epa.beans.EIAGeneration.GenerationSeries;
+import com.epa.beans.EIAGeneration.KeyItems;
 import com.epa.beans.EIAGeneration.PlantGeneration;
 import com.epa.beans.EISEmission.Pollutant;
 import com.epa.beans.Facility.Facility;
 import com.epa.beans.GHGEmissions.Emissions;
-import com.epa.beans.GHGEmissions.EmissionsData;
 import com.epa.beans.GHGEmissions.GasInfo;
 import com.epa.util.EPAConstants;
 import com.epa.util.EnviroFactsUtil;
@@ -70,31 +75,33 @@ public class CollectionControllerApiImpl {
 				System.out.println("Fac id calling " + urlBuilder.toString());
 	
 			    Facility[] facility = restTemplate.getForObject(urlBuilder.toString(), Facility[].class);
+			    
 				if(!clearAndAdd)
 					facList.objectList.clear();
 				
 				for(Facility fac : facility) {
-					facList.objectList.add(fac);
+					if(!facList.objectList.contains(fac))
+						facList.objectList.add(fac);
 				}
 				
-				
-				Session session = HibernateUtil.getSessionFactory().openSession();
+				/*Session session = HibernateUtil.getSessionFactory().openSession();
 				
 				Transaction tx = null;
 				try {
 					tx = session.beginTransaction();
-			        session.save(facility[0]);
+					for(int i = 0; i <= Integer.parseInt(rowEnd) - Integer.parseInt(rowStart); i++)
+						session.save(facility[i]);
+					
 			        tx.commit();
 				 } catch (HibernateException e) {
 				 	if (tx!=null) tx.rollback();
 				 		e.printStackTrace(); 
 				 } finally {
 					 session.close();
-				 }
+				 }*/
 				
 				return facList.toString();
 	
-				
 			case emissionsIdentifier:
 //				System.out.println("Entering emissions");
 			    
@@ -137,21 +144,7 @@ public class CollectionControllerApiImpl {
 		urlBuilder.append(EPAConstants.eiaBaseURL).append(EPAConstants.eiaSeriesHead).append(plantCode).append(EPAConstants.eiaSeriesTail);
 	//	System.out.println(urlBuilder.toString());
 		GenerationSeries plant = restTemplate.getForObject(urlBuilder.toString() , GenerationSeries.class);
-		
-		Session session = HibernateUtil.getSessionFactory().openSession();
-		
-		Transaction tx = null;
-		try {
-			tx = session.beginTransaction();
-	        session.save(plant.getSeries()[0]);
-	        tx.commit();
-		 } catch (HibernateException e) {
-		 	if (tx!=null) tx.rollback();
-		 		e.printStackTrace(); 
-		 } finally {
-			 session.close();
-		 }
-        
+		plant.setPlantCode(plantCode);
 		return plant;
 	}
 	
@@ -209,11 +202,11 @@ public class CollectionControllerApiImpl {
 		
 		getGreenhouseGasInfo("");
 		
-		for(int i=4000 ; i<5000; i+=50) {
+		for(int i=10000 ; i<40000; i+=50) {
 			
 			try {
 				initiateCollectionImpl("facid", "json", ""+i, ""+(i+49), "NAICS_CODE", "BEGINNING/2211", true);
-				initiateCollectionImpl("emissions", "json", ""+i, ""+(i+49), "year", "2016", true);
+				//initiateCollectionImpl("emissions", "json", ""+i, ""+(i+49), "year", "2016", true);
 			} catch (Exception e) {
 				System.out.println("Exception caught -->  " + e.getStackTrace());
 				i -= 50;
@@ -222,15 +215,36 @@ public class CollectionControllerApiImpl {
 //				initiateCollectionImpl("emissions", "json", ""+i, ""+(i+49), "year", "2016", true);
 			}
 		}
-		//initiateCollectionImpl("facid", "json", "0", "39542", "", "", true);
 		
+		for(Facility fac : facList.getObjectList()) {
+			
+			Session session = HibernateUtil.getSessionFactory().openSession();
+			
+			Transaction tx = null;
+			try {
+				tx = session.beginTransaction();
+				System.out.println("Inserting ---- " + fac.toString());
+				session.save(fac);
+				
+		        tx.commit();
+			 } catch (HibernateException e) {
+			 	if (tx!=null) tx.rollback();
+			 		e.printStackTrace(); 
+			 } finally {
+				 session.close();
+			 }
+			
+		}
+		return "Done";
+		//initiateCollectionImpl("facid", "json", "0", "39542", "", "", true);
+		/*
 		int emissionsExists = 0, generationExists = 0, both = 0;
 		boolean emi = false, gen = false;
 		
 		for(Facility fac : facList.objectList) {
-			if(EnviroFactsUtil.isNumeric(fac.getFacId())) {
-				System.out.println("Running fac id - " + fac.getFacId() + " generation -");
-				generationMap.put(fac.getFacId(), (getGenerationData(fac.getFacId())));
+			if(EnviroFactsUtil.isNumeric(fac.getPgmSysId())) {
+				System.out.println("Running fac id - " + fac.getPgmSysId() + " generation -");
+				generationMap.put(fac.getPgmSysId(), (getGenerationData(fac.getPgmSysId())));
 			}
 			
 			emi = false; gen = false;
@@ -240,9 +254,9 @@ public class CollectionControllerApiImpl {
 				emissionsExists++;
 			}
 			
-			if(generationMap.containsKey(fac.getFacId()) && generationMap.get(fac.getFacId()).getSeries() != null) {
+			if(generationMap.containsKey(fac.getPgmSysId()) && generationMap.get(fac.getPgmSysId()).getSeries() != null) {
 				gen = true;
-				System.out.println(generationMap.get(fac.getFacId()));
+				System.out.println(generationMap.get(fac.getPgmSysId()));
 				generationExists++;
 			}
 			
@@ -263,7 +277,7 @@ public class CollectionControllerApiImpl {
 		}
 		
 		System.out.println("Emissions exists = " + emissionsExists + "  Generation exists = " +  generationExists + "  both = " + both);
-		return finalResult.toString();
+		return finalResult.toString();  */
 	}
 	
 	public boolean clearLists() {
@@ -275,7 +289,7 @@ public class CollectionControllerApiImpl {
 		return true;
 	}
 
-	public String getAllGeneration() {
+	/* public String getAllGeneration() {
 		
 		System.out.println("Started....");
 		int gen = 0, fac = 0, both = 0;
@@ -312,5 +326,177 @@ public class CollectionControllerApiImpl {
 		}
 		
 		return "Gen = " + gen + " Fac = " + fac + " Both = " + both;
+	} */
+	
+	public String getAllGeneration() {
+		
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		int genFound = 0, genNotFound = 0;
+		
+		try {
+			Query query = session.createQuery("select pgmSysId from Facility");
+			List<String> list = query.list();
+//			System.out.println(list);
+			
+			for(String plantCode : list) {
+				GenerationSeries plant = getGenerationData(plantCode);  //9255 index gives plant code 2512
+				System.out.println(plant);
+				
+				if(plant.getSeries() != null) {
+					
+					Transaction tx = null;
+					tx = session.beginTransaction();
+					PlantGeneration plantGen = ((PlantGeneration) (plant.getSeries()[0]));
+					
+					for (String[] dataRow : plantGen.getData()) {
+						GenerationRow row = new GenerationRow();
+						KeyItems keyItems = new KeyItems();
+						keyItems.setPlantCode(plant.getPlantCode());
+						keyItems.setGenYear(dataRow[0].substring(0, 4));
+						keyItems.setGenMonth(dataRow[0].substring(4, 6));
+						row.setPlantName(plantGen.getName().split(":")[1].trim());
+						// If required to convert month in int to word use - new DateFormatSymbols().getMonths()[Integer.parseInt( dataRow[0].substring(4, 6))-1] 
+						row.setKeyTimes(keyItems);
+						row.setGenData(dataRow[1]);
+						row.setUnits(plantGen.getUnits());
+						row.setLatitude(plantGen.getLatitude());
+						row.setLongitude(plantGen.getLongitude());
+						System.out.println(row);
+						
+						session.save(row);
+						genFound++;
+					}
+					
+					
+	//					session.save(plant.getSeries()[0]);
+						tx.commit();
+				} else {
+					genNotFound++;
+					System.out.println("No generation for - " + plant.getPlantCode());
+				}
+			}
+			
+		} finally {
+		 session.close();
+		} 
+		
+		return "genFound = " + genFound + " genNotFound = " + genNotFound;
+	}
+
+	public String getGenerationFromFile() {
+		
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		int genFound = 0, genNotFound = 0;
+		Set<String> foundIds = new HashSet<String>();
+		
+		try {
+			List<String> lines = Files.readAllLines(Paths.get("C:\\Users\\epa\\git\\EWED\\src\\main\\resources\\genIds"));
+//			System.out.println(lines);
+			System.out.println("Total = " + lines.size());
+			
+			for(String plantCode : lines) {
+				GenerationSeries plant = getGenerationData(plantCode);  //9255 index gives plant code 2512
+				
+				if(plant.getSeries() != null) {
+//					System.out.println("Found - " + plantCode);
+					foundIds.add(plantCode);
+					
+					Transaction tx = null;
+					tx = session.beginTransaction();
+					PlantGeneration plantGen = ((PlantGeneration) (plant.getSeries()[0]));
+					
+					for (String[] dataRow : plantGen.getData()) {
+						GenerationRow row = new GenerationRow();
+						KeyItems keyItems = new KeyItems();
+						keyItems.setPlantCode(plant.getPlantCode());
+						keyItems.setGenYear(dataRow[0].substring(0, 4));
+						keyItems.setGenMonth(dataRow[0].substring(4, 6));
+						row.setPlantName(plantGen.getName().split(":")[1].trim());
+						// If required to convert month in int to word use - new DateFormatSymbols().getMonths()[Integer.parseInt( dataRow[0].substring(4, 6))-1] 
+						row.setKeyTimes(keyItems);
+						row.setGenData(dataRow[1]);
+						row.setUnits(plantGen.getUnits());
+						row.setLatitude(plantGen.getLatitude());
+						row.setLongitude(plantGen.getLongitude());
+						
+						System.out.println(row);
+						
+						session.save(row);
+						genFound++;
+					}
+					
+					tx.commit();
+//					genFound++;
+				} else {
+					genNotFound++;
+				}
+				
+				
+				
+			}
+			
+			/*Query query = session.createQuery("select distinct g.keyItems.plantCode from GenerationRow g"); //CreateQuery maps tables as the beans that it corresponds to.
+																							//Thus, we mention the mapped bean instead
+																								//of the table name that we want to query
+			List<String> facList = query.list();
+			System.out.println(facList);*/
+			
+			/*for(int i=0, j=0; i <= facList.size(); i++, j++) {
+				
+			}*/
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			session.close();
+		}
+		
+		return "genFound = " + foundIds.size() + " genNotFound = " + genNotFound;
+	}
+
+	public String getFacilityfromGen() {
+		
+		for(int i=0 ; i<7300; i+=50) {
+			
+			try {
+				String url = "https://iaspub.epa.gov/enviro/efservice/T_FRS_NAICS_EZ2/PGM_SYS_ACRNM/EIA-860/json/rows/" + i + ":" + (i+49);
+				System.out.println("Fac id calling " + url);
+				
+			    Facility[] facility = restTemplate.getForObject(url, Facility[].class);
+			    
+			    for(Facility fac : facility) {
+					if(!facList.objectList.contains(fac))
+						facList.objectList.add(fac);
+				}
+			    
+			} catch (Exception e) {
+				System.out.println("Exception caught -->  " + e.getStackTrace());
+				i -= 50;
+				continue;
+			}
+		}
+		 
+		
+	    
+	    for (Facility fac : facList.objectList) {
+	    	Session session = HibernateUtil.getSessionFactory().openSession();
+			
+			Transaction tx = null;
+			try {
+				tx = session.beginTransaction();
+				System.out.println("Inserting ---- " + fac.toString());
+				session.save(fac);
+				
+		        tx.commit();
+			 } catch (HibernateException e) {
+			 	if (tx!=null) tx.rollback();
+			 		e.printStackTrace(); 
+			 } finally {
+				 session.close();
+			 }
+	    }
+
+		return "Done";
 	}
 }
