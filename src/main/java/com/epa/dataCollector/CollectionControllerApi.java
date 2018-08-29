@@ -114,4 +114,9 @@ public class CollectionControllerApi {
 	public String getFacilityfromGen() {
 		return apiImpl.getFacilityfromGen();
 	}
+	
+	@RequestMapping(method = RequestMethod.GET, value = "/getEmissions")
+	public String getEmissions() {
+		return apiImpl.getEmissions();
+	}
 }

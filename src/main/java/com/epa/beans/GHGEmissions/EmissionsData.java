@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+
 public class EmissionsData {
 	
 	@JsonProperty("FACILITY_ID") String facId;
@@ -12,22 +13,25 @@ public class EmissionsData {
 	@JsonProperty("SUBSECTOR_ID") String subsectorId;
 	@JsonProperty("GAS_ID") String gasId;
 	@JsonProperty("CO2E_EMISSION") String emission;
-	GasInfo gasInfo;
+	@JsonProperty("PUB_FACTS_SECTOR_GHG_EMISSION_ROW") EmissionsData sectorEmissionsRow;
 	
 	public EmissionsData() {
 		// TODO Auto-generated constructor stub
 	}
 
-	public EmissionsData(String facId, String year, String sectorId, String subsectorId, String gasId, String unit, GasInfo gasInfo) {
+
+	public EmissionsData(String facId, String year, String sectorId, String subsectorId, String gasId, String emission,
+			EmissionsData sectorEmissionsRow) {
 		super();
 		this.facId = facId;
 		this.year = year;
 		this.sectorId = sectorId;
 		this.subsectorId = subsectorId;
 		this.gasId = gasId;
-		this.emission = unit;
-		this.gasInfo = gasInfo;
+		this.emission = emission;
+		this.sectorEmissionsRow = sectorEmissionsRow;
 	}
+
 
 	public String getFacId() {
 		return facId;
@@ -76,19 +80,20 @@ public class EmissionsData {
 	public void setEmission(String emission) {
 		this.emission = emission;
 	}
-
-	public GasInfo getGasInfo() {
-		return gasInfo;
+	
+	public EmissionsData getSectorEmissionsRow() {
+		return sectorEmissionsRow;
 	}
 
-	public void setGasInfo(GasInfo gasInfo) {
-		this.gasInfo = gasInfo;
+	public void setSectorEmissionsRow(EmissionsData sectorEmissionsRow) {
+		this.sectorEmissionsRow = sectorEmissionsRow;
 	}
+
 
 	@Override
 	public String toString() {
 		return "EmissionsData [facId=" + facId + ", year=" + year + ", sectorId=" + sectorId + ", subsectorId="
-				+ subsectorId + ", gasId=" + gasId + ", emission=" + emission + ", gasInfo=" + gasInfo + "]";
+				+ subsectorId + ", gasId=" + gasId + ", emission=" + emission + "]";
 	}
 	
 

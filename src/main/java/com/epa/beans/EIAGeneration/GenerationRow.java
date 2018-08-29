@@ -7,7 +7,7 @@ import javax.persistence.Table;
 
 
 @Entity
-@Table(name="generationEIA")
+@Table(name="generation")
 public class GenerationRow {
 	
 	@Column(name = "plantName")

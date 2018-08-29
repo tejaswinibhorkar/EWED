@@ -28,6 +28,9 @@ import com.epa.beans.EIAGeneration.PlantGeneration;
 import com.epa.beans.EISEmission.Pollutant;
 import com.epa.beans.Facility.Facility;
 import com.epa.beans.GHGEmissions.Emissions;
+import com.epa.beans.GHGEmissions.EmissionsData;
+import com.epa.beans.GHGEmissions.EmissionsKey;
+import com.epa.beans.GHGEmissions.EmissionsRow;
 import com.epa.beans.GHGEmissions.GasInfo;
 import com.epa.util.EPAConstants;
 import com.epa.util.EnviroFactsUtil;
@@ -48,7 +51,9 @@ public class CollectionControllerApiImpl {
 	public String initiateCollectionImpl(String dbName, String returnFormat, String rowStart, String rowEnd,
 						String filterField, String filterValue,  boolean clearAndAdd ) {
 		
-		String rowParam = EPAConstants.enviroFactsRowSpecifier + rowStart + ":" + rowEnd;
+		String rowParam = "";
+		if(rowStart != null && rowEnd != null)
+			rowParam = EPAConstants.enviroFactsRowSpecifier + rowStart + ":" + rowEnd;
 			
 		StringBuilder urlBuilder = new StringBuilder();
 		
@@ -106,26 +111,29 @@ public class CollectionControllerApiImpl {
 //				System.out.println("Entering emissions");
 			    
 				//http://localhost:8080/initiateCollection/emissions/json/0/0?filterField=year&filterValue=2016
-				
 				urlBuilder.replace(urlBuilder.indexOf(EPAConstants.additionalConstant), urlBuilder.indexOf(EPAConstants.additionalConstant)
-						+ EPAConstants.additionalConstant.length(), "naics_code/BEGINNING/2211/PUB_FACTS_SECTOR_GHG_EMISSION/sector_id/3/");
+						+ EPAConstants.additionalConstant.length(), EPAConstants.emissionJoinURL);
 				
 			    System.out.println(urlBuilder.toString());
 			    
 				Emissions[] emissions = restTemplate.getForObject(urlBuilder.toString(), Emissions[].class);
 				
+				
 				if(!clearAndAdd)
 					emissionsList.objectList.clear();
 				
 				for(Emissions em : emissions) {
-//					System.out.println(em + " ");
+//					System.out.println(em.getFrsId());
 					if(em.getEmissions() != null) {
 						emissionsList.objectList.add(em);
-						emissionsMap.put(em.getFacId(), em);
+						emissionsMap.put(em.getFrsId(), em);
+					} else {
+						System.out.println("Emissions is null, moving on");
 					}
 				}
 				
 //				return emissions[0].toString();
+//				System.out.println("returning - "+emissionsList.toString());
 				return emissionsList.toString();
 				/*ResponseEntity<String> responseEntity = restTemplate.getForEntity(urlBuilder.toString(),String.class);
 				Emissions[] response = gson.fromJson(responseEntity.toString() , Emissions[].class);
@@ -182,10 +190,26 @@ public class CollectionControllerApiImpl {
 		
 		GasInfo[] gases = restTemplate.getForObject(urlBuilder.toString() , GasInfo[].class);
 		
-		for(GasInfo g : gases)
-			gasInfoList.objectList.add(g);
+		for(GasInfo gasInfoObject : gases) {
+			gasInfoList.objectList.add(gasInfoObject);
+			Session session = HibernateUtil.getSessionFactory().openSession();
+			
+			Transaction tx = null;
+			try {
+				tx = session.beginTransaction();
+				System.out.println("Inserting ---- " + gasInfoObject.toString());
+				session.save(gasInfoObject);
+				
+		        tx.commit();
+			 } catch (HibernateException e) {
+			 	if (tx!=null) tx.rollback();
+			 		e.printStackTrace(); 
+			 } finally {
+				 session.close();
+			 }
+		}
 		
-		return gasInfoList.toString();
+		return gasInfoList.toString() + "Stored";
 	}
 	
 	public int getCount(String tableName) {
@@ -200,12 +224,12 @@ public class CollectionControllerApiImpl {
 			
 		StringBuilder finalResult = new StringBuilder();
 		
-		getGreenhouseGasInfo("");
+//		getGreenhouseGasInfo("");
 		
-		for(int i=10000 ; i<40000; i+=50) {
+		for(int i=0 ; i<50850; i+=50) {
 			
 			try {
-				initiateCollectionImpl("facid", "json", ""+i, ""+(i+49), "NAICS_CODE", "BEGINNING/2211", true);
+				initiateCollectionImpl("facid", "json", ""+i, ""+(i+49), "", "", true);
 				//initiateCollectionImpl("emissions", "json", ""+i, ""+(i+49), "year", "2016", true);
 			} catch (Exception e) {
 				System.out.println("Exception caught -->  " + e.getStackTrace());
@@ -224,7 +248,7 @@ public class CollectionControllerApiImpl {
 			try {
 				tx = session.beginTransaction();
 				System.out.println("Inserting ---- " + fac.toString());
-				session.save(fac);
+				session.saveOrUpdate(fac);
 				
 		        tx.commit();
 			 } catch (HibernateException e) {
@@ -334,7 +358,7 @@ public class CollectionControllerApiImpl {
 		int genFound = 0, genNotFound = 0;
 		
 		try {
-			Query query = session.createQuery("select pgmSysId from Facility");
+			Query query = session.createQuery("select distinct pgmSysId from Facility");
 			List<String> list = query.list();
 //			System.out.println(list);
 			
@@ -363,7 +387,7 @@ public class CollectionControllerApiImpl {
 						row.setLongitude(plantGen.getLongitude());
 						System.out.println(row);
 						
-						session.save(row);
+						session.saveOrUpdate(row);
 						genFound++;
 					}
 					
@@ -476,8 +500,6 @@ public class CollectionControllerApiImpl {
 				continue;
 			}
 		}
-		 
-		
 	    
 	    for (Facility fac : facList.objectList) {
 	    	Session session = HibernateUtil.getSessionFactory().openSession();
@@ -499,4 +521,75 @@ public class CollectionControllerApiImpl {
 
 		return "Done";
 	}
+
+	public String getEmissions() {
+		
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		Query query = session.createQuery("select distinct registryId from Facility");
+		List<String> list = query.list();
+		
+		int breaker=0, ctr=0, objectCtr=0, errorCnt=0;
+		for(String registryId : list) {
+//			breaker++;
+			try {
+				initiateCollectionImpl("emissions", "json", null, null, "frs_id", registryId, true);
+				ctr++;
+				System.out.println(ctr + " / " + list.size() + " done.. Error count = " + errorCnt);
+			} catch (Exception e) {
+				initiateCollectionImpl("emissions", "json", null, null, "frs_id", registryId, true);
+				ctr++;
+			}
+//			if(breaker==40) break;
+		
+			
+			
+//			System.out.println("List now - " + emissionsList.objectList.toString());
+	//		for(Emissions emission : emissionsList.objectList) {
+			while(objectCtr < emissionsList.objectList.size()) {
+				
+				Emissions emission = emissionsList.objectList.get(objectCtr);
+					if(emission != null) {
+					System.out.println(emission.toString());
+					EmissionsRow row = new EmissionsRow();
+					EmissionsKey key = new EmissionsKey();
+					key.setRegistryId(emission.getFrsId());
+					key.setEmYear(emission.getYear());
+					row.setLatitude(emission.getLatitude());
+					row.setLongitude(emission.getLongitude());
+
+					for(EmissionsData emissionData : emission.getEmissions()) {
+						if(emission.getEmissions()[0].getFacId() == null) {
+							emissionData = emission.getEmissions()[0].getSectorEmissionsRow();  	//Some emissions are reported as a single row called PUB_FACTS_SECTOR_GHG_EMISSION_ROW
+						}
+						Session session2 = HibernateUtil.getSessionFactory().openSession();
+						key.setGasId(emissionData.getGasId());
+						row.setEmissionsKey(key);
+						row.setSector(Integer.parseInt(emissionData.getSectorId()));
+						row.setEmissionAmount(emissionData.getEmission());
+						Transaction tx = null;
+						try {
+							
+							if(row.getEmissionAmount() != null) { 	//There are some emission rows with null emissions and gasIds
+								tx = session2.beginTransaction();
+								System.out.println("Inserting ---- " + row.toString());
+								session2.saveOrUpdate(row);
+								
+						        tx.commit();
+							}	
+						 } catch (HibernateException e) {
+						 	if (tx!=null) tx.rollback();
+						 		e.printStackTrace(); 
+						 		errorCnt++;
+						 } finally {
+							 session2.close();
+						 }
+					}
+					objectCtr++;
+				}
+			}
+		}  
+		session.close();
+		return "Done with errorCnt = " + errorCnt;
+	}
+	
 }

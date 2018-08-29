@@ -5,6 +5,8 @@ import org.hibernate.cfg.Configuration;
 
 import com.epa.beans.EIAGeneration.GenerationRow;
 import com.epa.beans.Facility.Facility;
+import com.epa.beans.GHGEmissions.EmissionsRow;
+import com.epa.beans.GHGEmissions.GasInfo;
  
 public class HibernateUtil {
 	
@@ -18,6 +20,8 @@ public class HibernateUtil {
 	                  //addPackage("com.xyz") //add package if used.
 	                  addAnnotatedClass(GenerationRow.class).
 	                  addAnnotatedClass(Facility.class).
+	                  addAnnotatedClass(GasInfo.class).
+	                  addAnnotatedClass(EmissionsRow.class).
 	                  buildSessionFactory();
 	     } catch (Throwable ex) { 
 	        System.err.println("Failed to create sessionFactory object." + ex);

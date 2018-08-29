@@ -1,12 +1,27 @@
 package com.epa.beans.GHGEmissions;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@Entity
+@Table(name="gasInfo")
 public class GasInfo {
 
+	@Id
+	@Column(name = "gasId")
 	@JsonProperty("GAS_ID") String gasId;
+	
+	@Column(name = "gasCode")
 	@JsonProperty("GAS_CODE") String gasCode;
+	
+	@Column(name = "gasName")
 	@JsonProperty("GAS_NAME") String gasName;
+	
+	@Column(name = "gasLabel")
 	@JsonProperty("GAS_LABEL") String gasLabel;
 	
 	public GasInfo() {
