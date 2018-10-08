@@ -484,7 +484,7 @@ public class CollectionControllerApiImpl {
 		for(int i=0 ; i<7300; i+=50) {
 			
 			try {
-				String url = "https://iaspub.epa.gov/enviro/efservice/T_FRS_NAICS_EZ2/PGM_SYS_ACRNM/EIA-860/json/rows/" + i + ":" + (i+49);
+				String url = "https://iaspub.epa.gov/enviro/efservice/frs_program_facility/PGM_SYS_ACRNM/EIA-860/json/rows/" + i + ":" + (i+49);
 				System.out.println("Fac id calling " + url);
 				
 			    Facility[] facility = restTemplate.getForObject(url, Facility[].class);
