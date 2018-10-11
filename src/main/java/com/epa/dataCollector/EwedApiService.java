@@ -1,10 +1,8 @@
 package com.epa.dataCollector;
 
-import com.epa.beans.Facility.Facility;
-
 public interface EwedApiService {
 
-	Facility getFacility(int pgmSysId);
-	Facility getFacility(String registryId);
+	public String getFacility(String filterField, String filterValue, String matchLevel, int minYear, int maxYear);
+	//Facility getFacility(String registryId);
 	
 }
