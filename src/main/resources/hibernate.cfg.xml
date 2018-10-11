@@ -8,7 +8,7 @@
         <property name="hibernate.connection.driver_class">com.microsoft.sqlserver.jdbc.SQLServerDriver	</property>
         <property name="hibernate.connection.url">jdbc:sqlserver://WINNIPEG;databaseName=EPA</property>
         <property name="hibernate.connection.username">appLogin</property>
-        <property name="hibernate.connection.password">kamime+92</property>
+        <property name="hibernate.connection.password"></property>
         
         <property name="hibernate.dialect">org.hibernate.dialect.SQLServerDialect</property>
         
