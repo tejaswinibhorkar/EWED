@@ -36,14 +36,13 @@ public class EwedApiServiceImpl implements EwedApiService {
 		Query query = session.createQuery(facilityQuery.toString());
 		
 		switch(matchLevel.toUpperCase()) {
-			case "BEGINNING" : query.setParameter(filterField, "'" + filterValue + "%'"); break;
-			case "CONTAINING" : query.setParameter(filterField, "'%" + filterValue + "%'"); break; 
-			case "ENDING" : query.setParameter(filterField, "'%" + filterValue + "'"); break;
-			default : break;
+			case "BEGINNING" :  query.setParameter(filterField,  filterValue + "%"); break;
+			case "CONTAINING" : query.setParameter(filterField, "%" + filterValue + "%"); break; 
+			case "ENDING" : query.setParameter(filterField, "%" + filterValue ); break;
+			default : query.setParameter(filterField, filterValue); break;
 		}
 		
-		System.out.println("Querying - " + query.toString());
-		query.setParameter(filterField, filterValue); 	//doing to prevent sql injection
+		System.out.println("Querying - " + query.getQueryString());
 		List<FacilityInfo> list = query.list();
 		
 		Map<String, String> returnData = new HashMap<String, String>();

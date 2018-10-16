@@ -19,7 +19,7 @@ public class WaterUsage {
 	String usageData;
 	
 	@Column(name="dervied")
-	int dervied;
+	boolean dervied;
 }
 
 @Embeddable
