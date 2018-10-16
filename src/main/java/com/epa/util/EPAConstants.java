@@ -22,8 +22,10 @@ public class EPAConstants {
 	//URL Constants
 	public static final String enviroFactsBaseURL = "https://iaspub.epa.gov/enviro/efservice/";
 	public static final String enviroFactsRowSpecifier = "/rows/";
+
 	public static final String eiaAPIKey = "***";		//spare - ***
 	public static final String eiaBaseURL = "http://api.eia.gov/series/?api_key=" + eiaAPIKey + "&series_id=";
+
 	public static final String additionalConstant = "%#additional#%/";
 	public static final String emissionJoinURL = "PUB_FACTS_SECTOR_GHG_EMISSION/";
 	
