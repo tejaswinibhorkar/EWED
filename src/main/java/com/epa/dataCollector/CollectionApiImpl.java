@@ -37,7 +37,7 @@ import com.epa.util.EnviroFactsUtil;
 import com.epa.util.HibernateUtil;
 
 @Service
-public class CollectionControllerApiImpl {
+public class CollectionApiImpl implements CollectionApiService{
 
 	private static RestTemplate restTemplate = EnviroFactsUtil.getRestTemplate();
 	private static ObjectList<Facility> facList = new ObjectList<Facility>();

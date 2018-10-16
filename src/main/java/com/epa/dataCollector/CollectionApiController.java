@@ -13,22 +13,18 @@ import com.epa.util.EnviroFactsUtil;
 
 
 @RestController
-public class CollectionControllerApi {
+public class CollectionApiController {
 
 	@Autowired
-	CollectionControllerApiImpl apiImpl;
+	CollectionApiService apiService;
 	
    private static final Logger LOG = LoggerFactory.getLogger(EnviroFactsUtil.class);
 //   private static CollectionControllerApiImpl apiImpl = new CollectionControllerApiImpl();
    
 	@RequestMapping("/test")
 	public String test() {
-		System.out.println("Reached test");
-		
-//		Session session = HibernateUtil.getSessionFactory().openSession();
-//        session.beginTransaction();
-        
-		return "Got it!";
+		System.out.println("Reached collection test");
+		return "Reached collection test!";
 	}
 	
 	/**
@@ -58,13 +54,13 @@ public class CollectionControllerApi {
 		
 		System.out.println("Reached here");
 //		return "Reached";
-		return apiImpl.initiateCollectionImpl(dbName, returnFormat, rowStart, rowEnd, filterField, filterValue, clearAndAdd);
+		return apiService.initiateCollectionImpl(dbName, returnFormat, rowStart, rowEnd, filterField, filterValue, clearAndAdd);
 	}
 
 	@RequestMapping(method = RequestMethod.GET,  value = "/getGenerationData/{plantCode}")
 	public String getGenerationData( @PathVariable(value="plantCode") String plantCode) {
 		
-		return apiImpl.getGenerationData(plantCode).toString();
+		return apiService.getGenerationData(plantCode).toString();
 	}
 
 	
@@ -76,7 +72,7 @@ public class CollectionControllerApi {
 	 */
 	@RequestMapping(method = RequestMethod.GET,  value = "/getPollutantInfo")
 	public String getPollutantInfo( @RequestParam(value="pollutantCode", defaultValue = "") String pollutantCode) {
-		return apiImpl.getPollutantInfoImpl(pollutantCode);
+		return apiService.getPollutantInfoImpl(pollutantCode);
 	}
 	
 	/**
@@ -87,36 +83,36 @@ public class CollectionControllerApi {
 	 */
 	@RequestMapping(method = RequestMethod.GET,  value = "/getGreenhouseGasInfo")
 	public String getGreenhouseGasInfo( @RequestParam(value="gasId", defaultValue = "") String gasId) {
-		return apiImpl.getGreenhouseGasInfo(gasId);
+		return apiService.getGreenhouseGasInfo(gasId);
 	}
 
 	@RequestMapping(method = RequestMethod.GET,  value = "/getData")
 	public String getData() {
-		return apiImpl.getData();
+		return apiService.getData();
 	}
 	
 	@RequestMapping(method = RequestMethod.GET,  value = "/clearLists")
 	public boolean clearLists() {
-		return apiImpl.clearLists();
+		return apiService.clearLists();
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/getAllGeneration")
 	public String getAllGeneration() {
-		return apiImpl.getAllGeneration();
+		return apiService.getAllGeneration();
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/getGenerationFromFile")
 	public String getGenerationFromFile() {
-		return apiImpl.getGenerationFromFile();
+		return apiService.getGenerationFromFile();
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/getFacilityfromGen")
 	public String getFacilityfromGen() {
-		return apiImpl.getFacilityfromGen();
+		return apiService.getFacilityfromGen();
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/getEmissions")
 	public String getEmissions() {
-		return apiImpl.getEmissions();
+		return apiService.getEmissions();
 	}
 }

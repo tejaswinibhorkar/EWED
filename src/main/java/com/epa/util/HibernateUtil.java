@@ -3,10 +3,15 @@ package com.epa.util;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
+import com.epa.beans.EIAGeneration.GenerationPerRegistryIdView;
 import com.epa.beans.EIAGeneration.GenerationRow;
 import com.epa.beans.Facility.Facility;
+import com.epa.beans.Facility.FacilityInfo;
+import com.epa.beans.GHGEmissions.EmissionsMonthly;
 import com.epa.beans.GHGEmissions.EmissionsRow;
 import com.epa.beans.GHGEmissions.GasInfo;
+import com.epa.beans.WaterUsage.WaterUsage;
+import com.epa.beans.WaterUsage.WaterUsagePerRegView;
  
 public class HibernateUtil {
 	
@@ -22,6 +27,11 @@ public class HibernateUtil {
 	                  addAnnotatedClass(Facility.class).
 	                  addAnnotatedClass(GasInfo.class).
 	                  addAnnotatedClass(EmissionsRow.class).
+	                  addAnnotatedClass(FacilityInfo.class).
+	                  addAnnotatedClass(GenerationPerRegistryIdView.class).
+	                  addAnnotatedClass(EmissionsMonthly.class).
+	                  addAnnotatedClass(WaterUsage.class).
+	                  addAnnotatedClass(WaterUsagePerRegView.class).
 	                  buildSessionFactory();
 	     } catch (Throwable ex) { 
 	        System.err.println("Failed to create sessionFactory object." + ex);
@@ -40,7 +50,7 @@ public class HibernateUtil {
         getSessionFactory().close();
     }
     
- /*   p
+ /*   
  
     private static SessionFactory buildSessionFactory() {
         try {
