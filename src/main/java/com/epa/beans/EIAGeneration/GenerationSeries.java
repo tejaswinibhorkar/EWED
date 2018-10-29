@@ -5,6 +5,11 @@ import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * This class maps to the parent object of the generation 
+ * json othat is returned from EIA call.
+ *
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GenerationSeries {
 

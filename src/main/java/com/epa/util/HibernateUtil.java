@@ -17,6 +17,12 @@ public class HibernateUtil {
 	
 	private static SessionFactory sessionFactory = buildSessionFactory();
 	
+	/**
+	 * IMP - ALWAYS ADD A CLASS WHEN MAPPING NEW TABLE OR VIEW
+	 * 
+	 * @return SessionFactory object which is required to do all 
+	 * operations using hibernate.
+	 */
     private static SessionFactory buildSessionFactory() {
 
 		 try {

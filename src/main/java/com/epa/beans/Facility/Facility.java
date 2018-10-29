@@ -8,6 +8,14 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * This object can map to a single facility return
+ * object from envirofacts. Directly mapping this table to
+ * a SQL table can result in conflicts since pgmSysId and / or
+ * registryId may not unique within a set of results.
+ * The segregation of facilityInfo and facilityMapping has been
+ * done in order to avoid such conflicts. 
+ */
 @Entity
 @Table(name="facilityFRS860")
 @JsonIgnoreProperties(ignoreUnknown = true)

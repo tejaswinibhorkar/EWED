@@ -5,6 +5,11 @@ import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
+/**
+ * The composite key for the table Generation consists 
+ * of the following elements
+ *
+ */
 @Embeddable
 public class KeyItems implements Serializable{
 	

@@ -8,6 +8,11 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * Base class for facility information.
+ * This stores information per registryId.
+ *
+ */
 @Entity
 @Table(name="facility860Info")
 @JsonIgnoreProperties(ignoreUnknown = true)

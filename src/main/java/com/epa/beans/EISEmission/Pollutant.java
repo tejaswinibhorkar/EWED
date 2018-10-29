@@ -2,6 +2,9 @@ package com.epa.beans.EISEmission;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * Deprecated class for old emissions implementation
+ */
 public class Pollutant {
 	
 	@JsonProperty("POLLUTANT_CODE") String pollutantCode;

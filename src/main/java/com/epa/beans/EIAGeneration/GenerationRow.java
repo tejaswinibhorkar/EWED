@@ -5,6 +5,12 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+/**
+ * This class maps to the table that holds the 
+ * base generation information per plantCode
+ * and per month information
+ *
+ */
 
 @Entity
 @Table(name="generation")

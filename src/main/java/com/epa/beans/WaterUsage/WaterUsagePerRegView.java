@@ -10,6 +10,12 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Immutable;
 
+/**
+ * 
+ * View that holds water usage information per registryId. 
+ * All pgmSysId water usages are summed up per registryId.
+ *
+ */
 @Entity
 @Table(name="waterUsagePerReg")
 @Immutable
@@ -22,6 +28,12 @@ public class WaterUsagePerRegView {
 	String usageSum;
 }
 
+/**
+ * 
+ * The composite key for the above view consists of the 
+ * following fields
+ *
+ */
 @Embeddable
 class WaterViewKey implements Serializable {
 

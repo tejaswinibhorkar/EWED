@@ -8,6 +8,14 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+/**
+ * 
+ * Maps to the table storing emissions information per month.
+ * The values in this table come from derivation of coefficients.
+ * In the current implementation, all values in emissions Monthly are 
+ * derived since GHG gives yearly emissions data.
+ *
+ */
 @Entity
 @Table(name="emissionsMonthly")
 public class EmissionsMonthly {

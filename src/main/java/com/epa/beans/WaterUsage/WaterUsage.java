@@ -8,6 +8,11 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+/**
+ * 
+ * Base table that holds water usage information per plantCode
+ *
+ */
 @Entity
 @Table(name="waterUsage")
 public class WaterUsage {
@@ -22,6 +27,12 @@ public class WaterUsage {
 	boolean dervied;
 }
 
+/**
+ * 
+ * The composite key for the base table consists of the 
+ * following fields
+ *
+ */
 @Embeddable
 class WaterUsageKey implements Serializable {
 	

@@ -156,6 +156,7 @@ public class CollectionApiImpl implements CollectionApiService{
 		return plant;
 	}
 	
+	@Deprecated
 	public String getPollutantInfoImpl(String pollutantCode) {
 		
 		StringBuilder urlBuilder = new StringBuilder();

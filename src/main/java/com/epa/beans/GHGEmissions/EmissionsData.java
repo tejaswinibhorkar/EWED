@@ -3,8 +3,13 @@ package com.epa.beans.GHGEmissions;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * 
+ * Maps to one emissions information object returned 
+ * from the envirofacts GHG service call.
+ *
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
-
 public class EmissionsData {
 	
 	@JsonProperty("FACILITY_ID") String facId;

@@ -10,7 +10,11 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Immutable;
 
-
+/**
+ * This class is mapped to a view that holds 
+ * generation value per registryId per year
+ *
+ */
 @Entity
 @Table(name="genPerRegPerYear")
 @Immutable
@@ -24,6 +28,11 @@ public class GenerationPerRegistryIdView {
 	
 }
 
+/**
+ * The composite key for the table or view consists 
+ * of the following elements
+ *
+ */
 @Embeddable
 class GenViewKey implements Serializable{
 	/**

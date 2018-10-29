@@ -7,6 +7,11 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * Base table for gas information from GHG.
+ * Can map to one return object of gas info in the json.
+ *
+ */
 @Entity
 @Table(name="gasInfo")
 public class GasInfo {

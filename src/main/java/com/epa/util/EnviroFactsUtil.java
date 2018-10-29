@@ -16,6 +16,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class EnviroFactsUtil {
 	
+	/**
+	 * This method is the base setup for a future implementation of logging.
+	 * 
+	 * @param LOG
+	 * @param level
+	 * @param message
+	 */
 	public static void logMessage(Logger LOG, String level, String message) {
 		
 		message = new Date() + " " + message;
@@ -31,14 +38,26 @@ public class EnviroFactsUtil {
 	
 	}
 	
+	/**
+	 * IMP - This is one of the main functions of the application.
+	 * This function creates the rest template that is used to call and map jsons
+	 * to the objects created in the packages. 
+	 * 
+	 * @return Rest Template Instantiation with correct configurations
+	 */
 	public static RestTemplate getRestTemplate() {
 		RestTemplate restTemplate = new RestTemplate();
 		List<HttpMessageConverter<?>> messageConverters = new ArrayList<HttpMessageConverter<?>>();        
         //Add the Jackson Message converter
 	    MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
 	    ObjectMapper mapper = new ObjectMapper();
+	    
+	    //This feature allows all values that are single objects when only one 
+	    //object is returned and an array when multiple are returned. This 
+	    //feature ensures all single objects are also treated as arrays.
 	    mapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
 	    converter.setObjectMapper(mapper);
+	    
 	    // Note: here we are making this converter to process any kind of response, 
 	    // not only application/*json, which is the default behaviour
 	    converter.setSupportedMediaTypes(Arrays.asList(MediaType.ALL));
@@ -48,6 +67,13 @@ public class EnviroFactsUtil {
 	    return restTemplate;
 	}
 	
+	/**
+	 * Generic utility function to check whether a given string is a
+	 * number i.e. contains only numeric digits
+	 * 
+	 * @param s
+	 * @return boolean answer for if s is a number or not
+	 */
 	public static boolean isNumeric(String s) {  
 	    return s != null && s.matches("[-+]?\\d*\\.?\\d+");  
 	}  

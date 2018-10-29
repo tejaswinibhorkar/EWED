@@ -5,6 +5,12 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+/**
+ * Base table for emissions information.
+ * Maps to one object returned of emissions
+ * json from GHG.
+ *
+ */
 @Entity
 @Table(name="emissions")
 public class EmissionsRow {

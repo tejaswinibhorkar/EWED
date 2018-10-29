@@ -5,6 +5,12 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * 
+ * Facility List that can be used to store an iterable
+ * facility return information data structure in memory 
+ *
+ */
 @Component
 public class FacilityList {
 

@@ -11,7 +11,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.epa.util.EnviroFactsUtil;
 
-
+/**
+ * 
+ * The rest mapping of the server ends up on this controller.
+ * This is the default controller. 
+ *
+ */
 @RestController
 public class CollectionApiController {
 
@@ -86,31 +91,73 @@ public class CollectionApiController {
 		return apiService.getGreenhouseGasInfo(gasId);
 	}
 
+	/**
+	 * This functions gets all the facility information 
+	 * from the currently set base facility table
+	 * and saves or updates facility information.
+	 * 
+	 * @return Confirmation msg string
+	 */
 	@RequestMapping(method = RequestMethod.GET,  value = "/getData")
 	public String getData() {
 		return apiService.getData();
 	}
 	
+	/**
+	 * – This function has been made in case there are multiple
+	 *  functions called in one session of the server.
+	 *  It should be called before trying to grab multiple 
+	 *  forms of the same data or from different sources.
+	 *  
+	 *  @return Confirmation boolean
+	 */
 	@RequestMapping(method = RequestMethod.GET,  value = "/clearLists")
 	public boolean clearLists() {
 		return apiService.clearLists();
 	}
 	
+	/**
+	 * This function is used to get generation data on all the facilities 
+	 * currently present in the mapped facility table based upon their plant codes. 
+	 * They call the afore mentioned get generation data function to get information on each plant.
+	 * 
+	 * @return String delineating number of facilities whose generation were found
+	 * and not found.
+	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/getAllGeneration")
 	public String getAllGeneration() {
 		return apiService.getAllGeneration();
 	}
 	
+	/**
+	 * This function reads plantCodes from a file called genIds in the project structure.
+	 * This is useful if there are plantCodes to be read from a flat file.
+	 * @return String delineating number of facilities whose generation were found
+	 * and not found.
+	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/getGenerationFromFile")
 	public String getGenerationFromFile() {
 		return apiService.getGenerationFromFile();
 	}
 	
+	/**
+	 * This is a specialized version of the getData function where in you can
+	 *  get Facility from any url. In the current implementation, 
+	 *  the function gets all the data from frs_program_facility, 
+	 *  the base table of facility in envirofacts, for all facilities
+	 *   which have the acronym as EIA-860.
+	 * @return Confirmation string
+	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/getFacilityfromGen")
 	public String getFacilityfromGen() {
 		return apiService.getFacilityfromGen();
 	}
 	
+	/**
+	 * This function gets emissions data for facilities that exists in the
+	 *  mapped facility table. This retrieves data on the basis of registryIds. 
+	 * @return Confirmation with msg with a count of conflicts (if any)
+	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/getEmissions")
 	public String getEmissions() {
 		return apiService.getEmissions();

@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Service
 public class EwedApiServiceImpl implements EwedApiService {
 
+	//Object mapper is used to convert objects to jsons
 	@Autowired
 	ObjectMapper mapper;
 	
@@ -31,10 +32,13 @@ public class EwedApiServiceImpl implements EwedApiService {
 		session = HibernateUtil.getSessionFactory().openSession();
 		StringBuilder facilityQuery = new StringBuilder();
 		
+		//In hibernate if Select statement is not give, it assumes select *
+		
 		facilityQuery.append("from FacilityInfo where ").append(filterField).append(" LIKE :").append(filterField);
 		
 		Query query = session.createQuery(facilityQuery.toString());
 		
+		// Match level usage
 		switch(matchLevel.toUpperCase()) {
 			case "BEGINNING" :  query.setParameter(filterField,  filterValue + "%"); break;
 			case "CONTAINING" : query.setParameter(filterField, "%" + filterValue + "%"); break; 
@@ -82,8 +86,13 @@ public class EwedApiServiceImpl implements EwedApiService {
 				+ " where g.genViewKey.registryId in (:ids) and genYear >= :minYear and genYear <= :maxYear group by g.genViewKey.registryId");
 		*/
 		
+		/*Not the use of g.genViewKey.registryId is done to respect the structure of the
+		 * class that accomodates the presence of a composite key.
+		 */
+		
+		
 		Query query = session.createQuery("SELECT sum(genSum) from GenerationPerRegistryIdView g"
-				+ " where g.genViewKey.registryId in (:ids) and genYear >= :minYear and genYear <= :maxYear");
+				+ " where g.genViewKey.registryId in (:ids) and genYear between :minYear and :maxYear");
 		
 		query.setParameterList("ids", registryIds);
 		query.setParameter("minYear", minYear);
@@ -94,7 +103,7 @@ public class EwedApiServiceImpl implements EwedApiService {
 		returnData.generation = listResult.get(0);
 		
 		query = session.createQuery("SELECT sum(emissionAmount) from EmissionsMonthly e"
-					+ " where e.emissionsMonthlyKey.registryId in (:ids) and emYear >= :minYear and emYear <= :maxYear");
+					+ " where e.emissionsMonthlyKey.registryId in (:ids) and emYear between :minYear and :maxYear");
 		
 		query.setParameterList("ids", registryIds);
 		query.setParameter("minYear", minYear);
@@ -105,7 +114,7 @@ public class EwedApiServiceImpl implements EwedApiService {
 		returnData.emission = listResult.get(0);
 		
 		query = session.createQuery("SELECT sum(usageSum) from WaterUsagePerRegView w"
-				+ " where w.waterViewKey.registryId in (:ids) and usageYear >= :minYear and usageYear <= :maxYear");
+				+ " where w.waterViewKey.registryId in (:ids) and usageYear between :minYear and :maxYear");
 	
 		query.setParameterList("ids", registryIds);
 		query.setParameter("minYear", minYear);

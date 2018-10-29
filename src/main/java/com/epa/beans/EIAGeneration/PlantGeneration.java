@@ -3,7 +3,13 @@ package com.epa.beans.EIAGeneration;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
+/**
+ * This is the base class that can map for generation. 
+ * This is a deprecated form of mapping since
+ * GenerationRow has superceeded it. This can be used as a 
+ * reference for mapping similar jsons.
+ *
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PlantGeneration {
 

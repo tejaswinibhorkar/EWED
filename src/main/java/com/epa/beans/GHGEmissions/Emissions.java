@@ -3,6 +3,12 @@ package com.epa.beans.GHGEmissions;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * 
+ * Old implementation of mapping emissions data. 
+ * May be used for reference to map such jsons.
+ *
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Emissions {
 

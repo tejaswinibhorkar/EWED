@@ -5,6 +5,12 @@ import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
+/**
+ * 
+ * The composite key for emissions monthly consists of the following
+ * fields.
+ *
+ */
 @Embeddable
 public class EmissionsKey implements Serializable{
 
