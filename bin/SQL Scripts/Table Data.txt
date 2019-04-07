@@ -1,0 +1,28 @@
+Local SQL Server Tables - 
+
+1. dynamicWaterCoeff - This will hold the coefficients (water Usage per generation) per plantCode per year
+2. emissions - Base emissions table
+3. emissionsCoeff - This will hold the coefficients (emissions per generation) per registryId per year
+4. facility - Base facility table, can be used by hibernate to load data, but, has primary key as pgmSysId, thus 
+will give primary key constraint violation if all facilities are loaded.
+5. facility860 - All facilities with pgm_sys_acrnm as EIA-860. Adam's new view data.
+6. facility860Info, facility860Mapping - Check create script to find how this is created. Used to 
+map data in which one registryId has multiple facilities with pgmSysIds.
+7. facilityInfo, facilityMapping - Split of facility to accommodate above constraint for old data.
+8. gasInfo - Used for emissions as a reference table to know details of greenhouse gas on basis of gasId.
+9. generation - Base generation table
+10. generationEIA - generation data of only facilities with pgm_sys_acrnm as EIA-860. Later merged with generation.
+11. generationFile - Data pulled in from flat file of EIA to confirm integrity of EIA API data. Hibernate currently
+mapped to this table if pulling generation data from any flat file
+12. Water [year] - Water Usage data imported from flat file directly.
+13. waterUsage - waterUsage data - check scripts for creation
+14. [tableName]backup - backup kept before making changes.
+
+Local SQL Server Views - 
+1. emPerYear - Emissions summed up for all gasIds per registryId per year
+2. facAllRowsTemp - Check testing script
+3. facilityJoin - Merging data temporary view
+4. genPerRegPerYear - generationData summed up for all pgmSysIds (if more than 1) per registryId perYear
+5. genPerRegPerYearPerMonth - same as above just with monthly data instead of yearly.
+6. generationData summed up for all months per pgmSysIds.
+7. waterUsagePerYear - Sums up waterUsage for all months per plantCode per year
