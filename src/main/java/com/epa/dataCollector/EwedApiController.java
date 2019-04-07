@@ -57,4 +57,13 @@ public class EwedApiController {
 			@PathVariable(value="minYear") int minYear, @PathVariable(value="maxYear") int maxYear) {
 		return apiService.getFacility(filterField ,filterValue, matchLevel, minYear, maxYear);
 	}
+	
+	@RequestMapping("/getFacilityData/{filterField}/{filterValue}/{minYear}/{minMonth}/{maxYear}/{maxMonth}")
+	public String getFacilityData(
+			@PathVariable(value="filterField") String filterField, 
+			@PathVariable(value="filterValue") String filterValue, 
+			@PathVariable(value="minYear") int minYear, @PathVariable(value="minMonth") int minMonth, 
+			@PathVariable(value="maxYear") int maxYear, @PathVariable(value="maxMonth") int maxMonth) {
+		return apiService.getFacilityData(filterField ,filterValue, minYear, minMonth, maxYear, maxMonth);
+	}
 }

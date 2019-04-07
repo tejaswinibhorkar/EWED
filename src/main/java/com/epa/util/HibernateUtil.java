@@ -12,6 +12,7 @@ import com.epa.beans.GHGEmissions.EmissionsRow;
 import com.epa.beans.GHGEmissions.GasInfo;
 import com.epa.beans.WaterUsage.WaterUsage;
 import com.epa.beans.WaterUsage.WaterUsagePerRegView;
+import com.epa.views.GenEmWaterPerPlantCodePerMonthPerYearView;
  
 public class HibernateUtil {
 	
@@ -38,6 +39,7 @@ public class HibernateUtil {
 	                  addAnnotatedClass(EmissionsMonthly.class).
 	                  addAnnotatedClass(WaterUsage.class).
 	                  addAnnotatedClass(WaterUsagePerRegView.class).
+	                  addAnnotatedClass(GenEmWaterPerPlantCodePerMonthPerYearView.class).
 	                  buildSessionFactory();
 	     } catch (Throwable ex) { 
 	        System.err.println("Failed to create sessionFactory object." + ex);

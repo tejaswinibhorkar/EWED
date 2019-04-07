@@ -10,10 +10,14 @@ import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.epa.beans.EWEDMonthlyData;
 import com.epa.beans.EWEDataReturn;
+import com.epa.beans.Facility.Facility;
 import com.epa.beans.Facility.FacilityInfo;
 import com.epa.util.EPAConstants;
 import com.epa.util.HibernateUtil;
+import com.epa.views.GenEmWaterPerPlantCodePerMonthPerYearView;
+import com.epa.views.MonthlyFacilityData;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -133,5 +137,99 @@ public class EwedApiServiceImpl implements EwedApiService {
 		
 		return EPAConstants.genericErrorReturn;
 	}
+	
+	@Override
+	public String getFacilityData(String filterField, String filterValue, int minYear, int minMonth, int maxYear, int maxMonth) {
+			
+		session = HibernateUtil.getSessionFactory().openSession();
+		StringBuilder facilityQuery = new StringBuilder();
+				
+		facilityQuery.append("from Facility where ").append(filterField).append(" LIKE :").append(filterField);
+		
+		Query query = session.createQuery(facilityQuery.toString());
+		query.setParameter(filterField, filterValue);
+		
+		List<Facility> facList = query.list();
+		
+		System.out.println("Facilities list size = " + facList.size());
+		
+		List<String> plantCodes = new  ArrayList<String>();
+		for(Facility fac: facList) {
+			plantCodes.add(fac.getPgmSysId());
+		}
+		 List<GenEmWaterPerPlantCodePerMonthPerYearView> gewList = queryGEWView(plantCodes,minYear, minMonth, maxYear, maxMonth);
+		 
+		 String returnJson = returnData(facList,  gewList);
+		 
+		return returnJson;
+	}
+	
+	public List<GenEmWaterPerPlantCodePerMonthPerYearView> queryGEWView(List<String> plantCodes, int minYear, int minMonth, int maxYear, int maxMonth) {
+		
+		session = HibernateUtil.getSessionFactory().openSession();
+		
+		Query query = session.createQuery("from GenEmWaterPerPlantCodePerMonthPerYearView g"
+		+ " where g.genEmWaterKey.plantCode in (:ids) and"
+		+ " (( genYear = :minYear and genMonth >= :minMonth) OR" 
+		+ " (genYear > :minYear and genYear < :maxYear)" 
+		+ " OR (genYear = :maxYear and genMonth <= :maxMonth))" 
+		+ " order by plantCode, genYear, genMonth");
 
+		query.setParameterList("ids", plantCodes);
+		query.setParameter("minYear", minYear);
+		query.setParameter("maxYear", maxYear);
+		query.setParameter("minMonth", minMonth);
+		query.setParameter("maxMonth", maxMonth);
+		
+		System.out.println(query);
+		List<GenEmWaterPerPlantCodePerMonthPerYearView> gewList = query.list();
+		//System.out.println(gewList);
+		
+		return gewList;
+	
+	}
+	
+	public String returnData(List<Facility> facList, List<GenEmWaterPerPlantCodePerMonthPerYearView> gewList) {
+		
+		ArrayList<String>returnData = new ArrayList<String>();
+
+		for(Facility fac: facList) {
+			List<MonthlyFacilityData> facData = new ArrayList<MonthlyFacilityData>();
+			
+			String plantCode = fac.getPgmSysId();
+			
+			List<EWEDMonthlyData> monthlyDataList = new ArrayList<EWEDMonthlyData>();
+			
+			for(int i=0; i<gewList.size(); i++) {
+				GenEmWaterPerPlantCodePerMonthPerYearView data = gewList.get(i);
+				
+				if(data.getGenEmWaterKey().getPlantCode().equals(plantCode)) {
+					EWEDMonthlyData monthlyData = new EWEDMonthlyData();
+					monthlyData.year = data.getGenEmWaterKey().getGenYear();
+					monthlyData.month = data.getGenEmWaterKey().getGenMonth();
+					monthlyData.plantType = data.getPlantType();
+					monthlyData.generation = data.getGeneration();
+					monthlyData.emissions= data.getEmissions();
+					monthlyData.waterWithdrawal= data.getWaterWithdrawal();
+					monthlyData.waterConsumption= data.getWaterConsumption();
+					
+					monthlyDataList.add(monthlyData);
+					
+				}
+			}
+				
+				MonthlyFacilityData mfd = new MonthlyFacilityData();
+				mfd.facility = fac;
+				mfd.monthlyDataList = monthlyDataList;
+				facData.add(mfd);
+				
+				try {
+					returnData.add(mapper.writeValueAsString(facData));
+				} catch (JsonProcessingException e) {
+					e.printStackTrace();
+				}
+			} 
+		
+		return returnData.toString();
+	}
 }
