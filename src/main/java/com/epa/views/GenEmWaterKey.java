@@ -26,6 +26,19 @@ class GenEmWaterKey implements Serializable {
 	String genMonth;
 
 	
+	public GenEmWaterKey() {
+		super();
+	}
+
+
+	public GenEmWaterKey(String plantCode, String genYear, String genMonth) {
+		super();
+		this.plantCode = plantCode;
+		this.genYear = genYear;
+		this.genMonth = genMonth;
+	}
+
+
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}

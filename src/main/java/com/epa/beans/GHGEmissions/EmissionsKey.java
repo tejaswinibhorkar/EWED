@@ -5,12 +5,6 @@ import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
-/**
- * 
- * The composite key for emissions monthly consists of the following
- * fields.
- *
- */
 @Embeddable
 public class EmissionsKey implements Serializable{
 
@@ -19,8 +13,8 @@ public class EmissionsKey implements Serializable{
 	 */
 	private static final long serialVersionUID = -979102299038558768L;
 
-	@Column(name = "registryId")
-	String registryId;
+	@Column(name = "ORISCode")
+	String ORISCode;
 	
 	@Column(name = "emYear")
 	String emYear;
@@ -32,20 +26,24 @@ public class EmissionsKey implements Serializable{
 		// TODO Auto-generated constructor stub
 	}
 
-	public EmissionsKey(String registryId, String emYear, String gasId) {
+	public EmissionsKey(String ORISCode, String emYear, String gasId) {
 		super();
-		this.registryId = registryId;
+		this.ORISCode = ORISCode;
 		this.emYear = emYear;
 		this.gasId = gasId;
 	}
 
-	public String getRegsitryId() {
-		return registryId;
+	public String getORISCode() {
+		return ORISCode;
 	}
 
-	public void setRegistryId(String registryId) {
-		this.registryId = registryId;
+	
+
+	public void setORISCode(String oRISCode) {
+		ORISCode = oRISCode;
 	}
+
+	
 
 	public String getEmYear() {
 		return emYear;
@@ -65,15 +63,15 @@ public class EmissionsKey implements Serializable{
 
 	@Override
 	public String toString() {
-		return "EmissionsKey [registryId=" + registryId + ", emYear=" + emYear + ", gasId=" + gasId + "]";
+		return "EmissionsKey [ORISCode=" + ORISCode + ", emYear=" + emYear + ", gasId=" + gasId + "]";
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((ORISCode == null) ? 0 : ORISCode.hashCode());
 		result = prime * result + ((emYear == null) ? 0 : emYear.hashCode());
-		result = prime * result + ((registryId == null) ? 0 : registryId.hashCode());
 		result = prime * result + ((gasId == null) ? 0 : gasId.hashCode());
 		return result;
 	}
@@ -87,15 +85,15 @@ public class EmissionsKey implements Serializable{
 		if (getClass() != obj.getClass())
 			return false;
 		EmissionsKey other = (EmissionsKey) obj;
+		if (ORISCode == null) {
+			if (other.ORISCode != null)
+				return false;
+		} else if (!ORISCode.equals(other.ORISCode))
+			return false;
 		if (emYear == null) {
 			if (other.emYear != null)
 				return false;
 		} else if (!emYear.equals(other.emYear))
-			return false;
-		if (registryId == null) {
-			if (other.registryId != null)
-				return false;
-		} else if (!registryId.equals(other.registryId))
 			return false;
 		if (gasId == null) {
 			if (other.gasId != null)
@@ -105,4 +103,5 @@ public class EmissionsKey implements Serializable{
 		return true;
 	}
 
+	
 }

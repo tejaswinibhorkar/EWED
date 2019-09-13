@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Emissions {
 
-	@JsonProperty("FRS_ID") String frsId;  //Linked to Registry ID in  Facility
+	//@JsonProperty("FRS_ID") String frsId;  //Linked to Registry ID in  Facility
 	@JsonProperty("FACILITY_ID") String localFacId; 
 	@JsonProperty("NAICS_CODE") String naicsCode;
 	@JsonProperty("FACILITY_NAME") String facilityName;
@@ -30,7 +30,7 @@ public class Emissions {
 	public Emissions(String frsId, String localFacId, String naicsCode, String facilityName, String facilityAddress, String year,
 			String facilityZip, String latitude, String longitude, EmissionsData[] emissions) {
 		super();
-		this.frsId = frsId;
+		//this.frsId = frsId;
 		this.localFacId = localFacId;
 		this.naicsCode = naicsCode;
 		this.facilityName = facilityName;
@@ -42,7 +42,7 @@ public class Emissions {
 //		this.emission = emission;
 		this.emissions = emissions;
 	}
-
+/*
 	public String getFrsId() {
 		return frsId;
 	}
@@ -50,7 +50,7 @@ public class Emissions {
 	public void setFrsId(String frsId) {
 		this.frsId = frsId;
 	}
-
+*/
 	public String getLocalFacId() {
 		return localFacId;
 	}
@@ -144,7 +144,7 @@ public class Emissions {
 
 	@Override
 	public String toString() {
-		return "Emissions [frsId=" + frsId + ", localFacId=" + localFacId + ", naicsCode=" + naicsCode
+		return "Emissions [localFacId=" + localFacId + ", naicsCode=" + naicsCode
 				+ ", facilityName=" + facilityName + ", facilityAddress=" + facilityAddress + ", year=" + year
 				+ ", facilityZip=" + facilityZip + ", latitude=" + latitude + ", longitude=" + longitude
 				+ ", emissions=" +  printEmissions(emissions) + "]";

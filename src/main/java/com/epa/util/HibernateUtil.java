@@ -3,16 +3,21 @@ package com.epa.util;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
+import com.epa.beans.EIAGeneration.DominantPlantType;
 import com.epa.beans.EIAGeneration.GenerationPerRegistryIdView;
 import com.epa.beans.EIAGeneration.GenerationRow;
 import com.epa.beans.Facility.Facility;
+import com.epa.beans.Facility.Facility860;
 import com.epa.beans.Facility.FacilityInfo;
 import com.epa.beans.GHGEmissions.EmissionsMonthly;
 import com.epa.beans.GHGEmissions.EmissionsRow;
 import com.epa.beans.GHGEmissions.GasInfo;
+import com.epa.beans.GHGEmissions.LocalFacIdToORISCodeView;
+import com.epa.beans.WaterUsage.WaterAvailability;
 import com.epa.beans.WaterUsage.WaterUsage;
 import com.epa.beans.WaterUsage.WaterUsagePerRegView;
-import com.epa.views.GenEmWaterPerPlantCodePerMonthPerYearView;
+import com.epa.views.DefaultOutputJson;
+import com.epa.views.GenEmWaterView;
  
 public class HibernateUtil {
 	
@@ -39,7 +44,12 @@ public class HibernateUtil {
 	                  addAnnotatedClass(EmissionsMonthly.class).
 	                  addAnnotatedClass(WaterUsage.class).
 	                  addAnnotatedClass(WaterUsagePerRegView.class).
-	                  addAnnotatedClass(GenEmWaterPerPlantCodePerMonthPerYearView.class).
+	                  addAnnotatedClass(DominantPlantType.class).
+	                  addAnnotatedClass(LocalFacIdToORISCodeView.class).
+	                  addAnnotatedClass(GenEmWaterView.class). 
+	                  addAnnotatedClass(DefaultOutputJson.class).
+	                  addAnnotatedClass(WaterAvailability.class).
+	                  addAnnotatedClass(Facility860.class).
 	                  buildSessionFactory();
 	     } catch (Throwable ex) { 
 	        System.err.println("Failed to create sessionFactory object." + ex);
@@ -58,19 +68,4 @@ public class HibernateUtil {
         getSessionFactory().close();
     }
     
- /*   
- 
-    private static SessionFactory buildSessionFactory() {
-        try {
-            // Create the SessionFactory from hibernate.cfg.xml
-            return new Configuration().configure("C:\\Users\\epa\\git\\EWED\\hibernate.cfg.xml").buildSessionFactory();
-        } catch (Throwable ex) {
-            // Make sure you log the exception, as it might be swallowed
-            System.err.println("SessionFactory creation failed." + ex);
-            throw new ExceptionInInitializerError(ex);
-        }
-    }
- 
-   */
- 
 }

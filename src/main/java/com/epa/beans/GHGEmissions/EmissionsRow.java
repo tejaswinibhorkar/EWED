@@ -5,18 +5,15 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-/**
- * Base table for emissions information.
- * Maps to one object returned of emissions
- * json from GHG.
- *
- */
 @Entity
-@Table(name="emissions")
+@Table(name="emissionsNew")
 public class EmissionsRow {
 
 	@EmbeddedId
 	EmissionsKey emissionsKey;
+	
+	@Column(name = "localFacId")
+	String localFacId;
 	
 	@Column(name = "latitude")
 	String latitude;
@@ -34,9 +31,10 @@ public class EmissionsRow {
 		// TODO Auto-generated constructor stub
 	}
 
-	public EmissionsRow(EmissionsKey emissionsKey, String latitude, String longitude, String emissionAmount,
+	public EmissionsRow(EmissionsKey emissionsKey, String localFacId, String latitude, String longitude, String emissionAmount,
 			int sector) {
 		super();
+		this.localFacId = localFacId;
 		this.emissionsKey = emissionsKey;
 		this.latitude = latitude;
 		this.longitude = longitude;
@@ -83,11 +81,20 @@ public class EmissionsRow {
 	public void setSector(int sector) {
 		this.sector = sector;
 	}
+	
+	public String getLocalFacId() {
+		return localFacId;
+	}
+
+	public void setLocalFacId(String localFacId) {
+		this.localFacId = localFacId;
+	}
 
 	@Override
 	public String toString() {
-		return "EmissionsRow [emissionsKey=" + emissionsKey + ", latitude=" + latitude + ", longitude=" + longitude
-				+ ", emissionAmount=" + emissionAmount + ", sector=" + sector + "]";
+		return "EmissionsRow [emissionsKey=" + emissionsKey + ", localFacId=" + localFacId + ", latitude=" + latitude
+				+ ", longitude=" + longitude + ", emissionAmount=" + emissionAmount + ", sector=" + sector + "]";
 	}
 
+	
 }
