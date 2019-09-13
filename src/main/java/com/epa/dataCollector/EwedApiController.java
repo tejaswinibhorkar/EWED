@@ -1,13 +1,9 @@
 package com.epa.dataCollector;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.epa.views.Top4;
 
 @RequestMapping("/ewedService/")
 @RestController
@@ -112,14 +108,4 @@ public class EwedApiController {
 			@PathVariable(value="endYear") int endYear){
 		return apiService.processWaterAvailabilityFile(fileName, startYear, endYear);
 		}
-	
-//	@RequestMapping("/getTopRecords/{filterField1}/{filterValue1}/{filterField2}/{minYear}/{minMonth}/{maxYear}/{maxMonth}")
-//	public List<Top4> getTopRecords(
-//			@PathVariable(value="filterField1") String filterField1, 
-//			@PathVariable(value="filterValue1") String filterValue1, 
-//			@PathVariable(value="filterField2") String filterField2, 
-//			@PathVariable(value="minYear") int minYear, @PathVariable(value="minMonth") int minMonth, 
-//			@PathVariable(value="maxYear") int maxYear, @PathVariable(value="maxMonth") int maxMonth) {
-//		return apiService.getTop4Records(filterField1, filterValue1, filterField2, minYear, minMonth, maxYear, maxMonth);
-//		}
 }

@@ -282,7 +282,6 @@ public class CollectionApiImpl implements CollectionApiService{
 		try {
 			Query query = session.createQuery("select distinct pgmSysId from Facility");
 			List<String> list = query.list();
-//			System.out.println(list);
 			
 			for(String plantCode : list) {
 				GenerationSeries plant = getGenerationData(plantCode);  //9255 index gives plant code 2512

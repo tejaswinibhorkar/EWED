@@ -28,7 +28,6 @@ import com.epa.util.HibernateUtil;
 import com.epa.views.DefaultOutputJson;
 import com.epa.views.DefaultOutputJson_custom;
 import com.epa.views.GenEmWaterView;
-import com.epa.views.MonthlyFacilityData;
 import com.epa.views.Top4;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,8 +40,8 @@ public class EwedApiServiceImpl implements EwedApiService {
 	//Object mapper is used to convert objects to jsons
 	@Autowired
 	ObjectMapper mapper;
-	
 	public Session session;
+	NumberFormat formatter = new DecimalFormat("########.#########");  
 	
 	@Override
 	public String getFacility(String filterField, String filterValue, String matchLevel, int minYear, int maxYear) {
@@ -236,38 +235,38 @@ public class EwedApiServiceImpl implements EwedApiService {
 	
 	public String returnData(List<Facility> facList, List<GenEmWaterView> gewList, List<WaterAvailability> waterAvailabilityList) {
 		
+		// Stores the complete structure
 		Map<String, Object> completeGenEmWaterOutput = new HashMap<String, Object>();
-		List<MonthlyFacilityData>facWithMonthlyData = new ArrayList<MonthlyFacilityData>();
+		
+		// Stores the month wise summary of all facilities in the given range of year
 		HashMap<Integer, HashMap<Integer, DefaultOutputJson_custom>> facMonthWiseData = new HashMap<Integer, HashMap<Integer,DefaultOutputJson_custom>>();
 		
+		// Stores the detailed list of facility with monthly summary
+		List<Object> finalFacList = new ArrayList<Object>();
+		
+		// Stores the total summary data
 		Map<String, Object> totalSummaryData = new HashMap<String, Object>();
 		double totalGen = 0;
 		double totalEm = 0;
 		double totalWaterConsumption = 0;
 		double totalWaterWithdrawal = 0;
-		NumberFormat formatter = new DecimalFormat("########.#########");  
 		
-		List<Object> finalFacList = new ArrayList<Object>();
 		for(Facility fac: facList) {
 			
 			LinkedHashMap<Object, Object> facilityReturnMap = new LinkedHashMap<Object, Object>();
-			List<MonthlyFacilityData> facData = new ArrayList<MonthlyFacilityData>();
-			
+			//List<MonthlyFacilityData> facData = new ArrayList<MonthlyFacilityData>();
 			String plantCode = fac.getPgmSysId();
 			
 			List<EWEDMonthlyData> monthlyDataList = new ArrayList<EWEDMonthlyData>();
-			
 			Map<String, Object> monthlyDataSummary = new HashMap<String, Object>();
 			double monthlyGen = 0;
 			double monthlyEm = 0;
 			double monthlyWaterConsumption = 0;
 			double monthlyWaterWithdrawal = 0;
 			
-			
-			
 			for(int i=0; i<gewList.size(); i++) {
-				GenEmWaterView data = gewList.get(i);
 				
+				GenEmWaterView data = gewList.get(i);
 				if(data.getPlantCode().equals(plantCode)) {
 					EWEDMonthlyData monthlyData = new EWEDMonthlyData();
 					monthlyData.year = data.getGenYear();
@@ -374,6 +373,7 @@ public class EwedApiServiceImpl implements EwedApiService {
 		completeGenEmWaterOutput.put("All Facilities", finalFacList);
 		completeGenEmWaterOutput.put("MonthWiseSummary", facMonthWiseData);
 		
+		// Convert Map to JSON
 		try {
 			return mapper.writeValueAsString(completeGenEmWaterOutput);
 		} catch (JsonProcessingException e) {
@@ -387,108 +387,100 @@ public class EwedApiServiceImpl implements EwedApiService {
 	public String defaultGEWData(String filterName, int minYear, int minMonth, int maxYear, int maxMonth) {
 		
 		Map<String, Object> completeData = new HashMap<String, Object>();
-
-			
-			session = HibernateUtil.getSessionFactory().openSession();
-			
-			List<GenEmWaterView> defaultGewList =  new ArrayList<GenEmWaterView>();
-			
-			Map<String, String> totalSummaryData = new HashMap<String, String>();
-
-			double totalGen = 0;
-			double totalEm = 0;
-			double totalWaterConsumption = 0;
-			double totalWaterWithdrawal = 0;
-			
-			StringBuilder queryBuilder = new StringBuilder();
-			queryBuilder.append("SELECT new com.epa.views.DefaultOutputJson(cast(g.").append(filterName).append( " as string)").append(" as filterName,")
-			.append( " sum(g.generation) as generation, ")
-			.append( "sum(g.emissions) as emission, sum(g.waterWithdrawal) as waterWithdrawal, sum(g.waterConsumption) as waterConsumption)")
-			.append( " from com.epa.views.GenEmWaterView g")
-			.append( " where ((( genYear = :minYear and genMonth >= :minMonth) OR (genYear > :minYear)) and ((genYear = :maxYear and genMonth <= :maxMonth) or (genYear < :maxYear)))")
-			.append( " Group by " ).append( filterName);
-			
-			Query query = session.createQuery(queryBuilder.toString());
-			
-			query.setParameter("minYear", minYear);
-			query.setParameter("maxYear", maxYear);
-			query.setParameter("minMonth", minMonth);
-			query.setParameter("maxMonth", maxMonth);
-			
-			System.out.println(query);
-			
-			List<DefaultOutputJson> results = query.list();
-			
-			Map<String, Object>returnData = new HashMap<String, Object>();
-			
-			NumberFormat formatter = new DecimalFormat("########.#########");  
-			
-			for(DefaultOutputJson output: results) {
-				DefaultOutputJson_custom obj = new DefaultOutputJson_custom();
-				if(output.getFilterName() != null) {
-					double em = output.getEmission() != null ? Double.parseDouble(output.getEmission().trim()) : 0;
-					double gen = output.getGeneration() != null ? Double.parseDouble(output.getGeneration().trim()) : 0;
-					double wc = output.getWaterConsumption() != null ? Double.parseDouble(output.getWaterConsumption().trim()) : 0;
-					double ww = output.getWaterWithdrawal() != null ? Double.parseDouble(output.getWaterWithdrawal().trim()) : 0;
-					
-					obj.setEmission(formatter.format(em));
-					obj.setGeneration(formatter.format(gen));
-					obj.setWaterConsumption(formatter.format(wc));
-					obj.setWaterWithdrawal(formatter.format(ww));
-					
-					returnData.put(output.getFilterName(),obj);
-					
-					
-					totalGen += gen;
-					totalEm += em;
-					totalWaterConsumption += wc;
-					totalWaterWithdrawal += ww;
-				}
-			}
-			
-			completeData.put("Summary", returnData);
-			
-			
-			String genTotal = (formatter.format(totalGen));
-			String emTotal = (formatter.format(totalEm));
-			String wcTotal = (formatter.format(totalWaterConsumption));
-			String wwTotal = (formatter.format(totalWaterWithdrawal));
-			
-			totalSummaryData.put("TotalGeneration", (genTotal));
-			totalSummaryData.put("TotalEmission", (emTotal));
-			totalSummaryData.put("TotalWaterConsumption",(wcTotal));
-			totalSummaryData.put("TotalWaterWithdrawal",(wwTotal));
-			completeData.put("Total Summary", (totalSummaryData));
-			
-			
-			Map<String, Object> topRecords = new HashMap<String, Object>();
-			if(filterName.equals("plantType")) {
-				List<Top4> genList = getTop4Records("", "", filterName, "generation", minYear, minMonth, maxYear, maxMonth);
-				System.out.println("genList= " + genList.size());
-				List<Top4> emList = getTop4Records("", "", filterName, "emissions", minYear, minMonth, maxYear, maxMonth);
-				System.out.println("emList = " + emList.size());
-				List<Top4> wwList = getTop4Records("", "", filterName, "waterWithdrawal", minYear, minMonth, maxYear, maxMonth);
-				System.out.println("wwList = " + wwList.size());
-				List<Top4> wcList = getTop4Records("", "", filterName, "waterConsumption", minYear, minMonth, maxYear, maxMonth);
-				System.out.println("wcList = " + wcList.size());
-				
-				topRecords.put("topGen", genList);
-				topRecords.put("topEm", emList);
-				topRecords.put("topWW", wwList);
-				topRecords.put("topWC", wcList);
-				
-				completeData.put("Top_Records", topRecords);
-			}
-			
-			try {
-				return mapper.writeValueAsString(completeData);
-			} catch (JsonProcessingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			return "Error";
+		session = HibernateUtil.getSessionFactory().openSession();
 		
+		Map<String, String> totalSummaryData = new HashMap<String, String>();
+		double totalGen = 0;
+		double totalEm = 0;
+		double totalWaterConsumption = 0;
+		double totalWaterWithdrawal = 0;
+		
+		StringBuilder queryBuilder = new StringBuilder();
+		queryBuilder.append("SELECT new com.epa.views.DefaultOutputJson(cast(g.").append(filterName).append( " as string)").append(" as filterName,")
+		.append( " sum(g.generation) as generation, ")
+		.append( "sum(g.emissions) as emission, sum(g.waterWithdrawal) as waterWithdrawal, sum(g.waterConsumption) as waterConsumption)")
+		.append( " from com.epa.views.GenEmWaterView g")
+		.append( " where ((( genYear = :minYear and genMonth >= :minMonth) OR (genYear > :minYear)) and ((genYear = :maxYear and genMonth <= :maxMonth) or (genYear < :maxYear)))")
+		.append( " Group by " ).append( filterName);
+		
+		Query query = session.createQuery(queryBuilder.toString());
+		
+		query.setParameter("minYear", minYear);
+		query.setParameter("maxYear", maxYear);
+		query.setParameter("minMonth", minMonth);
+		query.setParameter("maxMonth", maxMonth);
+		
+		System.out.println(query);
+		
+		List<DefaultOutputJson> results = query.list();
+		
+		Map<String, Object>returnData = new HashMap<String, Object>();
+		
+		for(DefaultOutputJson output: results) {
+			DefaultOutputJson_custom obj = new DefaultOutputJson_custom();
+			if(output.getFilterName() != null) {
+				double em = output.getEmission() != null ? Double.parseDouble(output.getEmission().trim()) : 0;
+				double gen = output.getGeneration() != null ? Double.parseDouble(output.getGeneration().trim()) : 0;
+				double wc = output.getWaterConsumption() != null ? Double.parseDouble(output.getWaterConsumption().trim()) : 0;
+				double ww = output.getWaterWithdrawal() != null ? Double.parseDouble(output.getWaterWithdrawal().trim()) : 0;
+				
+				obj.setEmission(formatter.format(em));
+				obj.setGeneration(formatter.format(gen));
+				obj.setWaterConsumption(formatter.format(wc));
+				obj.setWaterWithdrawal(formatter.format(ww));
+				
+				returnData.put(output.getFilterName(),obj);
+				
+				totalGen += gen;
+				totalEm += em;
+				totalWaterConsumption += wc;
+				totalWaterWithdrawal += ww;
+			}
 		}
+		
+		completeData.put("Summary", returnData);
+		
+		String genTotal = (formatter.format(totalGen));
+		String emTotal = (formatter.format(totalEm));
+		String wcTotal = (formatter.format(totalWaterConsumption));
+		String wwTotal = (formatter.format(totalWaterWithdrawal));
+		
+		totalSummaryData.put("TotalGeneration", (genTotal));
+		totalSummaryData.put("TotalEmission", (emTotal));
+		totalSummaryData.put("TotalWaterConsumption",(wcTotal));
+		totalSummaryData.put("TotalWaterWithdrawal",(wwTotal));
+		completeData.put("Total Summary", (totalSummaryData));
+		
+		
+		Map<String, Object> topRecords = new HashMap<String, Object>();
+		if(filterName.equals("plantType")) {
+			List<Top4> genList = getTop4Records("", "", filterName, "generation", minYear, minMonth, maxYear, maxMonth);
+			System.out.println("genList= " + genList.size());
+			List<Top4> emList = getTop4Records("", "", filterName, "emissions", minYear, minMonth, maxYear, maxMonth);
+			System.out.println("emList = " + emList.size());
+			List<Top4> wwList = getTop4Records("", "", filterName, "waterWithdrawal", minYear, minMonth, maxYear, maxMonth);
+			System.out.println("wwList = " + wwList.size());
+			List<Top4> wcList = getTop4Records("", "", filterName, "waterConsumption", minYear, minMonth, maxYear, maxMonth);
+			System.out.println("wcList = " + wcList.size());
+			
+			topRecords.put("topGen", genList);
+			topRecords.put("topEm", emList);
+			topRecords.put("topWW", wwList);
+			topRecords.put("topWC", wcList);
+			
+			completeData.put("Top_Records", topRecords);
+		}
+		
+		try {
+			return mapper.writeValueAsString(completeData);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return "{\"Result\": \"Data not found\"}";
+	
+	}
+	
 	//end-point to get water availability json output
 	public String returnWaterAvailabilityFromHUCs(String filterField, String filterValue, int minYear, int minMonth, int maxYear, int maxMonth) {
 		List<String> hucCodes = new  ArrayList<String>();
@@ -598,10 +590,8 @@ public class EwedApiServiceImpl implements EwedApiService {
 		if(plantCodes.size() == 0) {
 			return "{\"Result\": \"Data not found\"}";
 		}
+		
 		session = HibernateUtil.getSessionFactory().openSession();
-		
-		List<GenEmWaterView> defaultGewList =  new ArrayList<GenEmWaterView>();
-		
 		StringBuilder viewQuery = new StringBuilder();
 		
 		if(filterField2.equals("fuelType")) {
@@ -634,7 +624,6 @@ public class EwedApiServiceImpl implements EwedApiService {
 		System.out.println("output list summarry = " + results.size());
 		
 		Map<String, Object>returnData = new HashMap<String, Object>();
-		NumberFormat formatter = new DecimalFormat("########.#########"); 
 		
 		for(DefaultOutputJson output: results) {
 			DefaultOutputJson_custom obj = new DefaultOutputJson_custom();
@@ -679,7 +668,7 @@ public class EwedApiServiceImpl implements EwedApiService {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return "Error";
+		return "{\"Result\": \"Data not found\"}";
 	}
 	
 	public List<Top4> getTop4Records(String filterField1, String filterValue1, String filterField2, String totalOf, int minYear, int minMonth, int maxYear, int maxMonth) {
@@ -714,8 +703,6 @@ public class EwedApiServiceImpl implements EwedApiService {
 	
 		List<Object[]> results = (List<Object[]>)query.list();
 		System.out.println("output list size = " + results.size());
-		
-		NumberFormat formatter = new DecimalFormat("########.#########");
 		
 		List<Top4> listOfTop4 = new ArrayList<Top4>();
 		for(Object[] arr : results) {
@@ -761,11 +748,9 @@ public class EwedApiServiceImpl implements EwedApiService {
 				int year  = Integer.parseInt(data[1]);
 				if((year >= startYear) && (year <= endYear)) {
 					writer.writeNext(data); 
-//					System.out.println(line);
 				}
 				// read next line
 				line = reader.readLine();
-				
 			}
 			reader.close();
 			writer.close(); 
@@ -773,6 +758,6 @@ public class EwedApiServiceImpl implements EwedApiService {
 			e.printStackTrace();
 		}
 		
-		return "Done";
+		return "{\"Result\": \"Done\"}";
 	}
 }
