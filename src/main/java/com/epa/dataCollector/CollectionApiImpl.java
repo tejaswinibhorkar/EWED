@@ -506,65 +506,50 @@ public class CollectionApiImpl implements CollectionApiService{
 	}
 	
 	//Get Dominant Plant Type of the Facility
-	
-		
-			
-
-
 	public String getAllDominantType() {
 				
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		Query query = session.createQuery("select distinct pgmSysId from Facility");
 		List<String> plantCodes = query.list();
 		
-		int size = plantCodes.size();
 		System.out.println("Total plantcodes= " + plantCodes.size());
 		
-		//	System.out.println("plantcode at index 1957 " + plantCodes.get(1957));
-		// int count = 0;
+		int partitionSize = 2000;
+		for (int i = 0; i < plantCodes.size(); i += partitionSize) {
+			List<String> partPlantCodes = new ArrayList<String>();
+			if(plantCodes.size() < i+partitionSize)
+				partPlantCodes = plantCodes.subList(i, plantCodes.size());
+			else
+				partPlantCodes = plantCodes.subList(i, i+partitionSize);
 		
-	   // for(String plantCode: plantCodes) {
-		for(int i=4000;i< plantCodes.size(); i++) {
-			String plantCode = plantCodes.get(i);
-			System.out.println( "Plancode = " + plantCode);
-			//System.out.println(size--);
-			
-			Map<Integer, String> yearTypeMap = new HashMap<Integer, String>();
-			Map<Integer, Double>maxYearWiseEnergyMap = new HashMap<Integer, Double>();
-	
-			
-			for(String plantType: allPlantTypes) {
-				PlantGeneration[] plantGenerations = getPlantGenerationPlantTypeWise(plantCode, plantType);
-				if(plantGenerations != null) {
-					for(PlantGeneration plantGen: plantGenerations) {
+			for(int j=0; j<partPlantCodes.size(); j++) {
+				String plantCode = partPlantCodes.get(j);
+				System.out.println( "Plancode = " + plantCode);
+				
+				Map<Integer, String> yearTypeMap = new HashMap<Integer, String>();
+				Map<Integer, Double>maxYearWiseEnergyMap = new HashMap<Integer, Double>();
 		
-						String [][] data = plantGen.getData();
-						for(String[] s: data) {
-							int year = Integer.parseInt(s[0]);
-							double energy = Double.parseDouble(s[1]);
-							
-							if((maxYearWiseEnergyMap.containsKey(year) && maxYearWiseEnergyMap.get(year) < energy) || !maxYearWiseEnergyMap.containsKey(year)) {
-						
-								maxYearWiseEnergyMap.put(year, energy);
-								yearTypeMap.put(year, plantType);
-							}	
+				for(String plantType: allPlantTypes) {
+					PlantGeneration[] plantGenerations = getPlantGenerationPlantTypeWise(plantCode, plantType);
+					if(plantGenerations != null) {
+						for(PlantGeneration plantGen: plantGenerations) {
+							String [][] data = plantGen.getData();
+							for(String[] s: data) {
+								int year = Integer.parseInt(s[0]);
+								double energy = Double.parseDouble(s[1]);
+								
+								if((maxYearWiseEnergyMap.containsKey(year) && maxYearWiseEnergyMap.get(year) < energy) || !maxYearWiseEnergyMap.containsKey(year)) {
+									maxYearWiseEnergyMap.put(year, energy);
+									yearTypeMap.put(year, plantType);
+								}	
+							}
 						}
 					}
 				}
+				
+				saveDominantTypeToDB(plantCode, yearTypeMap);
+				PlantdominantTypeMap.put(plantCode, yearTypeMap);
 			}
-			
-			saveDominantTypeToDB(plantCode, yearTypeMap);
-			PlantdominantTypeMap.put(plantCode, yearTypeMap);
-			/*count++;
-			
-			if(count == 2000) {
-				System.out.println("*********************************************************************************");
-				System.out.println("2000 RECORDS PROCESSED!!!!!! breaking the looopppp");
-				System.out.println("Last plant code processed:  "  + plantCode);
-				System.out.println("*********************************************************************************");
-				break;
-			} 
-			*/
 		}
 		
 		System.out.println("Final Map: " + PlantdominantTypeMap);
@@ -597,9 +582,6 @@ public class CollectionApiImpl implements CollectionApiService{
 	}
 			
 	public String saveDominantTypeToDB(String plantCode, Map<Integer, String> yearTypeMap) {
-				
-		//populate data
-		//getAllDominantType();
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		Transaction tx = null;
 		try {

@@ -26,4 +26,6 @@ public interface CollectionApiService {
 	public String getFacilityfromGen();
 	
 	public String getEmissions();
+	
+	public String getAllDominantType();
 }

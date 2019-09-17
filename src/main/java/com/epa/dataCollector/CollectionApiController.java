@@ -162,4 +162,13 @@ public class CollectionApiController {
 	public String getEmissions() {
 		return apiService.getEmissions();
 	}
+	
+	/**
+	 * This function gets the dominant plant type for all facilities that exists in the
+	 *  mapped facility table. 
+	 */
+	@RequestMapping(method = RequestMethod.GET, value = "/getAllDominantType")
+	public String getAllDominantType() {
+		return apiService.getAllDominantType();
+	}
 }
