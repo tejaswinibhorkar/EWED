@@ -6,16 +6,15 @@
 <hibernate-configuration>
     <session-factory>
         <property name="hibernate.connection.driver_class">com.microsoft.sqlserver.jdbc.SQLServerDriver	</property>
-       
+       <!-- 
         <property name="hibernate.connection.url">jdbc:sqlserver://vndata.cloudapp.net:56789;databaseName=ewed</property>
         <property name="hibernate.connection.username">ewedcsus</property>
         <property name="hibernate.connection.password">Qstcm!2</property>
-            <!--
+       -->  
         <property name="hibernate.connection.url">jdbc:sqlserver://WINNIPEG;databaseName=EPA</property>
         <property name="hibernate.connection.username">appLogin</property>
         <property name="hibernate.connection.password">kamime+92</property>
-       
-     -->
+        
         <property name="hibernate.dialect">org.hibernate.dialect.SQLServerDialect</property>
         
         <property name="hibernate.show_sql">true</property>

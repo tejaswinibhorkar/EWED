@@ -506,7 +506,7 @@ public class CollectionApiImpl implements CollectionApiService{
 	}
 	
 	//Get Dominant Plant Type of the Facility
-	public String getAllDominantType() {
+	public String getAllDominantType(int startYear, int endYear) {
 				
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		Query query = session.createQuery("select distinct pgmSysId from Facility");
@@ -514,8 +514,8 @@ public class CollectionApiImpl implements CollectionApiService{
 		
 		System.out.println("Total plantcodes= " + plantCodes.size());
 		
-		int partitionSize = 2000;
-		for (int i = 0; i < plantCodes.size(); i += partitionSize) {
+		int partitionSize = 500;
+		for (int i = 5692; i < plantCodes.size(); i += partitionSize) {
 			List<String> partPlantCodes = new ArrayList<String>();
 			if(plantCodes.size() < i+partitionSize)
 				partPlantCodes = plantCodes.subList(i, plantCodes.size());
@@ -530,7 +530,7 @@ public class CollectionApiImpl implements CollectionApiService{
 				Map<Integer, Double>maxYearWiseEnergyMap = new HashMap<Integer, Double>();
 		
 				for(String plantType: allPlantTypes) {
-					PlantGeneration[] plantGenerations = getPlantGenerationPlantTypeWise(plantCode, plantType);
+					PlantGeneration[] plantGenerations = getPlantGenerationPlantTypeWise(plantCode, plantType,startYear,endYear);
 					if(plantGenerations != null) {
 						for(PlantGeneration plantGen: plantGenerations) {
 							String [][] data = plantGen.getData();
@@ -556,12 +556,16 @@ public class CollectionApiImpl implements CollectionApiService{
 		return PlantdominantTypeMap.toString(); 
 	}
 			
-	public PlantGeneration[] getPlantGenerationPlantTypeWise(String plantCode, String plantType){
+	public PlantGeneration[] getPlantGenerationPlantTypeWise(String plantCode, String plantType, int startYear, int endYear){
 				
 		PlantGeneration[] plantGeneration = null;
 		
 		StringBuilder urlBuilder = new StringBuilder();
-		urlBuilder.append(EPAConstants.eiaBaseURL).append(EPAConstants.eiaSeriesHead).append(plantCode).append("-" + plantType + ".A");
+		//urlBuilder.append(EPAConstants.eiaBaseURL).append(EPAConstants.eiaSeriesHead).append(plantCode).append("-" + plantType + ".A");
+		
+		urlBuilder.append(EPAConstants.eiaBaseURL).append(EPAConstants.eiaSeriesHead).append(plantCode).append("-" + plantType + ".A")
+		.append("&start=").append(startYear).append("&end=").append(endYear);
+
 		System.out.println(urlBuilder.toString());
 		
 		RestTemplate rst = new RestTemplate();

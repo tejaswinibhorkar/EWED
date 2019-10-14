@@ -167,8 +167,10 @@ public class CollectionApiController {
 	 * This function gets the dominant plant type for all facilities that exists in the
 	 *  mapped facility table. 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/getAllDominantType")
-	public String getAllDominantType() {
-		return apiService.getAllDominantType();
+	@RequestMapping(method = RequestMethod.GET, value = "/getAllDominantType/{startYear}/{endYear}")
+	public String getAllDominantType(
+			@PathVariable(value="startYear") int startYear,
+			@PathVariable(value="endYear") int endYear) {
+		return apiService.getAllDominantType(startYear, endYear);
 	}
 }

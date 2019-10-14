@@ -82,6 +82,64 @@ public class GenEmWaterView {
 	@Column(name="plantType")
 	String plantType;
 	
+	@Column(name="coolingSystemType")
+	String coolingSystemType;
+	
+	@Column(name="waterType")
+	String waterType;
+	
+	@Column(name="waterSource")
+	String waterSource;
+	
+	@Column(name="waterSourceName")
+	String waterSourceName;
+	
+	public String getCoolingSystemType() {
+		return coolingSystemType;
+	}
+
+
+
+	public void setCoolingSystemType(String coolingSystemType) {
+		this.coolingSystemType = coolingSystemType;
+	}
+
+
+
+	public String getWaterType() {
+		return waterType;
+	}
+
+
+
+	public void setWaterType(String waterType) {
+		this.waterType = waterType;
+	}
+
+
+
+	public String getWaterSource() {
+		return waterSource;
+	}
+
+
+
+	public void setWaterSource(String waterSource) {
+		this.waterSource = waterSource;
+	}
+
+
+
+	public String getWaterSourceName() {
+		return waterSourceName;
+	}
+
+
+
+	public void setWaterSourceName(String waterSourceName) {
+		this.waterSourceName = waterSourceName;
+	}
+
 	@Column(name="generation")
 	String generation;
 	
@@ -100,10 +158,42 @@ public class GenEmWaterView {
 
 	
 
+//	public GenEmWaterView(String plantCode, int genYear, int genMonth, String primaryName, int naicsCode,
+//			float registryId, String facAddr, String cityName, String stateName, String postalCode, float latitude,
+//			float longitude, int gEOID, String countyState1, String countyState2, int hUC8Code, String hUC8Name,
+//			float hUC8Acres, String plantType, String generation, String emissions, String waterWithdrawal,
+//			String waterConsumption) {
+//		super();
+//		this.plantCode = plantCode;
+//		this.genYear = genYear;
+//		this.genMonth = genMonth;
+//		this.primaryName = primaryName;
+//		this.naicsCode = naicsCode;
+//		this.registryId = registryId;
+//		this.facAddr = facAddr;
+//		this.cityName = cityName;
+//		this.stateName = stateName;
+//		this.postalCode = postalCode;
+//		this.latitude = latitude;
+//		this.longitude = longitude;
+//		this.GEOID = gEOID;
+//		this.CountyState1 = countyState1;
+//		this.CountyState2 = countyState2;
+//		this.HUC8Code = hUC8Code;
+//		this.HUC8Name = hUC8Name;
+//		this.HUC8Acres = hUC8Acres;
+//		this.plantType = plantType;
+//		this.generation = generation;
+//		this.emissions = emissions;
+//		this.waterWithdrawal = waterWithdrawal;
+//		this.waterConsumption = waterConsumption;
+//	}
+
 	public GenEmWaterView(String plantCode, int genYear, int genMonth, String primaryName, int naicsCode,
 			float registryId, String facAddr, String cityName, String stateName, String postalCode, float latitude,
 			float longitude, int gEOID, String countyState1, String countyState2, int hUC8Code, String hUC8Name,
-			float hUC8Acres, String plantType, String generation, String emissions, String waterWithdrawal,
+			float hUC8Acres, String plantType, String coolingSystemType, String waterType, String waterSource,
+			String waterSourceName, String generation, String emissions, String waterWithdrawal,
 			String waterConsumption) {
 		super();
 		this.plantCode = plantCode;
@@ -118,72 +208,43 @@ public class GenEmWaterView {
 		this.postalCode = postalCode;
 		this.latitude = latitude;
 		this.longitude = longitude;
-		GEOID = gEOID;
-		CountyState1 = countyState1;
-		CountyState2 = countyState2;
-		HUC8Code = hUC8Code;
-		HUC8Name = hUC8Name;
-		HUC8Acres = hUC8Acres;
+		this.GEOID = gEOID;
+		this.CountyState1 = countyState1;
+		this.CountyState2 = countyState2;
+		this.HUC8Code = hUC8Code;
+		this.HUC8Name = hUC8Name;
+		this.HUC8Acres = hUC8Acres;
 		this.plantType = plantType;
+		this.coolingSystemType = coolingSystemType;
+		this.waterType = waterType;
+		this.waterSource = waterSource;
+		this.waterSourceName = waterSourceName;
 		this.generation = generation;
 		this.emissions = emissions;
 		this.waterWithdrawal = waterWithdrawal;
 		this.waterConsumption = waterConsumption;
 	}
 
+
+
 	public GenEmWaterView(String plantCode, int genYear, int genMonth,
-			String plantType, String generation, String emissions, String waterWithdrawal, String waterConsumption) {
+			String plantType, String coolingSystemType, String waterType, String waterSource,
+			String waterSourceName, String generation, String emissions, String waterWithdrawal, String waterConsumption) {
 		super();
 		this.plantCode = plantCode;
 		this.genYear = genYear;
 		this.genMonth = genMonth;
 		this.plantType = plantType;
+		this.coolingSystemType = coolingSystemType;
+		this.waterType = waterType;
+		this.waterSource = waterSource;
+		this.waterSourceName = waterSourceName;
 		this.generation = generation;
 		this.emissions = emissions;
 		this.waterWithdrawal = waterWithdrawal;
 		this.waterConsumption = waterConsumption;
 	}
-
-
-
-//	public GenEmWaterView(GenEmWaterKey genEmWaterKey, String primaryName, String naicsCode, String registryId,
-//			String facAddr, String cityName, String stateName, String postalCode, String latitude, String longitude,
-//			String gEOID, String countyState1, String countyState2, String hUC8Code, String hUC8Name, String hUC8Acres,
-//			String plantType, String generation, String emissions, String waterWithdrawal, String waterConsumption) {
-//		super();
-//		this.genEmWaterKey = genEmWaterKey;
-//		this.primaryName = primaryName;
-//		this.naicsCode = naicsCode;
-//		this.registryId = registryId;
-//		this.facAddr = facAddr;
-//		this.cityName = cityName;
-//		this.stateName = stateName;
-//		this.postalCode = postalCode;
-//		this.latitude = latitude;
-//		this.longitude = longitude;
-//		GEOID = gEOID;
-//		CountyState1 = countyState1;
-//		CountyState2 = countyState2;
-//		HUC8Code = hUC8Code;
-//		HUC8Name = hUC8Name;
-//		HUC8Acres = hUC8Acres;
-//		this.plantType = plantType;
-//		this.generation = generation;
-//		this.emissions = emissions;
-//		this.waterWithdrawal = waterWithdrawal;
-//		this.waterConsumption = waterConsumption;
-//	}
-
-//	public GenEmWaterKey getGenEmWaterKey() {
-//		return genEmWaterKey;
-//	}
-//
-//	public void setGenEmWaterKey(GenEmWaterKey genEmWaterKey) {
-//		this.genEmWaterKey = genEmWaterKey;
-//	}
 	
-	
-
 	public String getPrimaryName() {
 		return primaryName;
 	}

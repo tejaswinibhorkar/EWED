@@ -27,5 +27,5 @@ public interface CollectionApiService {
 	
 	public String getEmissions();
 	
-	public String getAllDominantType();
+	public String getAllDominantType(int startYear, int endYear);
 }

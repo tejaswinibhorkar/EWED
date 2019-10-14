@@ -211,7 +211,7 @@ public class EwedApiServiceImpl implements EwedApiService {
 				partPlantCodes = plantCodes.subList(i, i+partitionSize);
 			
 			StringBuilder gewQueryBuilder = new StringBuilder();
-			gewQueryBuilder.append("SELECT new com.epa.views.GenEmWaterView (g.plantCode, g.genYear, g.genMonth, g.plantType, g.generation, g.emissions, g.waterWithdrawal, g.waterConsumption) ")
+			gewQueryBuilder.append("SELECT new com.epa.views.GenEmWaterView (g.plantCode, g.genYear, g.genMonth, g.plantType, g.coolingSystemType, g.waterType, g.waterSource, g.waterSourceName, g.generation, g.emissions, g.waterWithdrawal, g.waterConsumption) ")
 			.append("from GenEmWaterView g where (g.plantCode in (:ids) and ")
 			.append("((( genYear = :minYear and genMonth >= :minMonth) OR (genYear > :minYear)) and ((genYear = :maxYear and genMonth <= :maxMonth) or (genYear < :maxYear)))) ")
 			.append("order by plantCode, genYear, genMonth");
@@ -272,6 +272,10 @@ public class EwedApiServiceImpl implements EwedApiService {
 					monthlyData.year = data.getGenYear();
 					monthlyData.month = data.getGenMonth();
 					monthlyData.plantType = data.getPlantType();
+					monthlyData.coolingSystemType = data.getCoolingSystemType();
+					monthlyData.waterType = data.getWaterType();
+					monthlyData.waterSource = data.getWaterSource();
+					monthlyData.waterSourceName = data.getWaterSourceName();
 					monthlyData.generation = data.getGeneration() != null ? formatter.format(Double.parseDouble(data.getGeneration().trim())) : "null";
 					monthlyData.emissions= data.getEmissions() != null ? formatter.format(Double.parseDouble(data.getEmissions().trim())) : "null";
 					monthlyData.waterWithdrawal= data.getWaterWithdrawal() != null ?  formatter.format(Double.parseDouble(data.getWaterWithdrawal().trim())) : "null";
@@ -326,6 +330,7 @@ public class EwedApiServiceImpl implements EwedApiService {
 					}
 				}
 			}
+			System.out.println(facMonthWiseData);
 			
 			//Loop on waterAvailabilityList to add WA data
 			for(WaterAvailability waData: waterAvailabilityList) {
